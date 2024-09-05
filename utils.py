@@ -63,10 +63,6 @@ def destructive_swap(n_qubit):
     return qml
 
 def interpret_results(data):
-  def generate_combinations(n):
-      # Generate all combinations of '0' and '1' of length n
-      combinations = [''.join(comb) for comb in itertools.product('01', repeat=n)]
-      return combinations
 
   def check_parity_bitwise_and(s):
     n = len(s)
@@ -76,8 +72,9 @@ def interpret_results(data):
     parity = and_result.count('1') % 2
 
     return parity
-
-  dictdata = dict(zip(generate_combinations(len(data)),data))
+  
+  comb = [bin(i)[2:].zfill(int(np.log2(len(data)))) for i in range(len(data))]
+  dictdata = dict(zip(comb,data))
   kk={}
   for k,item in dictdata.items():
     if dictdata[k]>0.00000001:
