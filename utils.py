@@ -9,8 +9,17 @@ import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error as mse
 from scipy.optimize import minimize
 from IPython.display import clear_output
+import random 
+from pennylane.optimize import AdamOptimizer,QNSPSAOptimizer
 
 
+def autoencoder_fulldense(param,n_qubit,trash_qubit,original_swap=True):
+    strprm=0
+    for a in range(trash_qubit-1*original_swap):
+        start=trash_qubit+a
+        current_param=2*(n_qubit-a)
+        fclayer(n_qubit-a,param[strprm:current_param+strprm],start=start)
+        strprm=current_param+strprm
 
 def create_isotropic_state(p, n_qubit, start):
     qml.Hadamard(wires=start)
@@ -26,8 +35,16 @@ def create_isotropic_state(p, n_qubit, start):
         qml.CNOT(wires=[start+i , start+1+i])
     return qml
 
-
-
+def fclayer(qb,parameter,start):
+    for i in range(start,qb+start):
+       qml.RY(parameter[(i-start)*2+1],wires=i)
+    for i in range(start,qb+start-1,2):
+       qml.CNOT(wires=[i,i+1])
+    for i in range(start+1,qb+start-1,2):
+        qml.CNOT(wires=[i,i+1])
+    for i in range(start,qb+start):
+       qml.RX(parameter[(i-start)*2+qb],wires=i)
+   
 def dense(a,b,parameters):
     qml.RY(parameters[0],wires=a)
     qml.RY(parameters[1],wires=b)
@@ -97,5 +114,42 @@ def interpret_results(data):
   return fail
 
 
+def train_full_dense(X,opt,n_qubit_autoencoder,n_qubit_swap,repetition,epochs,visual=False):
+    loss = []   
+    layerparam=4
+    n_qubit=n_qubit_autoencoder+n_qubit_swap 
+    num_params=sum([layerparam*n_qubit_autoencoder//2**(i+1) for i in range(repetition)])
+    num_params=2*np.sum([i for i in range(n_qubit_autoencoder-n_qubit_swap,n_qubit_autoencoder+1)])
+    weights = np.array([random.uniform(0, np.pi) for _ in range(num_params)], requires_grad=True)
+    wq=[weights]
+
+    dvc=qml.device('default.qubit', wires=n_qubit, shots=None)
+    @qml.qnode(dvc,diff_method='adjoint')
+    def trainer(param,p):
+        
+        create_isotropic_state(p, n_qubit_autoencoder, n_qubit_swap)
+        qml.Barrier()
+        autoencoder_fulldense(param, n_qubit_autoencoder,n_qubit_swap)
+        qml.Barrier()
+        original_swap(n_qubit_swap)
+        return qml.probs([0])
+    
+    def loss_function(w): 
+        pred =np.array([trainer(w,x)[1] for x in X], requires_grad=True)
+        current_loss = pred.mean()
+        return current_loss
+
+    for epoch in range(epochs):
+        weights, loss_value = opt.step_and_cost(loss_function, wq[-1])
+        print(f'Epoch {epoch}: Loss = {loss_value}',end='\r')
+
+        loss.append(loss_value)
+        wq.append(weights)
+    if visual:
+        fig, ax = qml.draw_mpl(trainer)(wq[-1],.56)
+        plt.show(   )
+
+
+    return loss, wq
 
 
