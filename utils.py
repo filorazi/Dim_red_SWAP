@@ -18,12 +18,21 @@ from pennylane.optimize import AdamOptimizer,QNSPSAOptimizer
 def original_swap(wires):
   qml.Hadamard(wires=0)
   
-  for ctrl,target in enumerate(wires):
-    qml.CSWAP(wires=[0,ctrl, target])
+  for target in wires:
+    qml.CSWAP(wires=[0,target[0], target[1]])
   qml.Hadamard(wires=0)
   return qml
 
-
+def isotropic_state( p, wires):
+    qml.Hadamard(wires=wires[0])
+    theta = 2 * np.arccos(np.sqrt(p))
+    for i in wires[:-1]:
+        qml.CNOT(wires=[i , 1+i])
+    for i in wires:
+        qml.RX(theta, wires=i)
+    for i in wires[:-1]:
+        qml.CNOT(wires=[i , 1+i])
+ 
 def destructive_swap(n_qubit):
     for wires in range(n_qubit): 
         qml.CNOT(wires=[wires,wires+n_qubit])
