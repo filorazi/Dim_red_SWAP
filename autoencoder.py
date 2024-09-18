@@ -97,7 +97,7 @@ class Autoencoder():
         qml.Hadamard(wires=0)
 
 
-    def show_cirq(self):
+    def plot_cirq(self):
         @qml.qnode(self.__dvc,diff_method='adjoint')
         def trainer(param,p):
             
@@ -136,6 +136,12 @@ class Autoencoder():
         self.__loss=loss
         return loss, self.__wq.copy()
     
+
+    # Note that this is the worst tabu in Deep learning, 
+    # you should never take the best parameter based on 
+    # training results. 
+    # Having said that Ill change this as soon as I 
+    # implement the evaluation of the validation set.
     def best_params(self):
         return self.__wq[np.argmin(self.__loss)+1] 
     

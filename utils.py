@@ -13,72 +13,13 @@ import random
 from pennylane.optimize import AdamOptimizer,QNSPSAOptimizer
 
 
-def autoencoder_fulldense(param,n_qubit,trash_qubit,original_swap=True):
-    strprm=0
-    for a in range(trash_qubit-1*original_swap):
-        start=trash_qubit+a
-        current_param=2*(n_qubit-a)
-        fclayer(n_qubit-a,param[strprm:current_param+strprm],start=start)
-        strprm=current_param+strprm
-
-def create_isotropic_state(p, n_qubit, start):
-    qml.Hadamard(wires=start)
-    theta = 2 * np.arccos(np.sqrt(p))
-
-    for i in range(n_qubit-1):
-        qml.CNOT(wires=[start+i , start+1+i])
-    
-    for i in range(n_qubit):
-        qml.RX(theta, wires=start+i)
-
-    for i in range(n_qubit-1):
-        qml.CNOT(wires=[start+i , start+1+i])
-    return qml
-
-def fclayer(qb,parameter,start):
-    for i in range(start,qb+start):
-       qml.RY(parameter[(i-start)*2+1],wires=i)
-    for i in range(start,qb+start-1,2):
-       qml.CNOT(wires=[i,i+1])
-    for i in range(start+1,qb+start-1,2):
-        qml.CNOT(wires=[i,i+1])
-    for i in range(start,qb+start):
-       qml.RX(parameter[(i-start)*2+qb],wires=i)
-   
-def dense(a,b,parameters):
-    qml.RY(parameters[0],wires=a)
-    qml.RY(parameters[1],wires=b)
-    qml.RX(parameters[2],wires=a)
-    qml.RX(parameters[3],wires=b)
-    qml.CNOT(wires=[a,b])
-    qml.RY(parameters[4],wires=a)
-    qml.RY(parameters[5],wires=b)
-    qml.CNOT(wires=[b,a])
-
-def pool(a,b):
-    qml.CRZ(np.pi,wires=[a,b])
-    qml.X(a)  
-    qml.CRX(np.pi,wires=[a,b])
-
-def autoencoder(offset,param,repetition,n_qubit):
-    start=0
-    layerparam=6
-    for i in range(repetition):
-        if start % 2!=0:
-            raise Exception('The number of qubits should be a power of 2 greater than 2 to the power of repetition')
-
-        for a in range(start,( n_qubit-start)//2+start):
-            param_corrente=sum([layerparam*n_qubit//2**(j+1) for j in range(i)])+(a-start)*layerparam            
-            a+=offset
-            dense(a,a+(n_qubit-start)//2,param[param_corrente:param_corrente +layerparam])
-            pool(a,a+(n_qubit-start)//2)
-        start+=n_qubit//(2**(i+1))
 
 
-def original_swap(n_qubit_swap):
+def original_swap(wires):
   qml.Hadamard(wires=0)
-  for wires in range(1,n_qubit_swap):
-    qml.CSWAP(wires=[0,wires,wires+n_qubit_swap-1])
+  
+  for ctrl,target in enumerate(wires):
+    qml.CSWAP(wires=[0,ctrl, target])
   qml.Hadamard(wires=0)
   return qml
 
@@ -113,10 +54,12 @@ def interpret_results(data):
       fail += i
   return fail
 
-
-def train_full_dense(X,opt,n_qubit_autoencoder,n_qubit_swap,repetition,epochs,visual=False):
+## TODO
+'''
+def train_log_depth(X,opt,n_qubit_autoencoder,repetition,epochs,visual=False):
     loss = []   
-    layerparam=4
+    layerparam=6
+    n_qubit_swap=n_qubit_autoencoder-n_qubit_autoencoder//(2**(repetition)) +1
     n_qubit=n_qubit_autoencoder+n_qubit_swap 
     num_params=sum([layerparam*n_qubit_autoencoder//2**(i+1) for i in range(repetition)])
     num_params=2*np.sum([i for i in range(n_qubit_autoencoder-n_qubit_swap,n_qubit_autoencoder+1)])
@@ -152,4 +95,5 @@ def train_full_dense(X,opt,n_qubit_autoencoder,n_qubit_swap,repetition,epochs,vi
 
     return loss, wq
 
+'''
 
