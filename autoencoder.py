@@ -30,19 +30,24 @@ class Autoencoder():
         self.__n_qubit = n_qubit_autoencoder+self.__n_qubit_swap
         self.__dvc=device
         self.__num_params=sum([ 2*(n_qubit_autoencoder-i)+2 for i in range(n_qubit_trash)])
+        self.__num_params=3*n_qubit_autoencoder+n_qubit_autoencoder*(n_qubit_autoencoder-1)
         self.__wq=[np.array([random.uniform(0, np.pi) for _ in range(self.__num_params)], requires_grad=True)]
 
+    # def autoencoder_fulldense_train(self,param):
+    #     strprm=0
+    #     for a in range(self.__n_qubit_trash):
+    #         start=self.__n_qubit_trash+a+1
+    #         current_param=2*(self.__n_qubit_auto-a)+2
+    #         self.fclayer(self.__n_qubit_auto-a,param[strprm:current_param+strprm],start=start)
+    #         strprm=current_param+strprm
+    
     def autoencoder_fulldense_train(self,param):
         strprm=0
-        for a in range(self.__n_qubit_trash):
-            start=self.__n_qubit_trash+a+1
-            current_param=2*(self.__n_qubit_auto-a)+2
-            self.fclayer(self.__n_qubit_auto-a,param[strprm:current_param+strprm],start=start)
-            strprm=current_param+strprm
+        self.original_auto(self.__n_qubit_auto,param,start=self.__n_qubit_swap)
 
     def create_isotropic_state(self, p, start):
         qml.Hadamard(wires=start)
-        theta = 2 * np.arccos(np.sqrt(p))
+        theta = p
         for i in range(self.__n_qubit_auto-1):
             qml.CNOT(wires=[start+i , start+1+i])
         for i in range(self.__n_qubit_auto):
@@ -69,6 +74,21 @@ class Autoencoder():
             qml.CNOT(wires=[start,i])
         qml.RY(parameter[-2],wires=start)
         qml.RX(parameter[-1],wires=start)
+
+    def original_auto(self,qb,parameter,start):
+        for i in range(start,qb+start):
+            qml.RY(parameter[i-start],wires=i)
+        for i in range(start,qb+start):
+            qml.RX(parameter[i-start +qb],wires=i)
+        pindex=0
+        for j in range(start,qb+start):
+            for i in range(start,qb+start):
+                if j != i:
+                    qml.CRX(parameter[pindex +2*qb],wires=[j,i])
+                    pindex-=-1
+        for i in range(start,qb+start):
+            qml.RY(parameter[i-start+2*qb+qb*(qb-1)],wires=i)
+
 
     def dense(self,a,b,parameters):
         qml.RY(parameters[0],wires=a)
@@ -102,7 +122,6 @@ class Autoencoder():
 
     def original_swap(self):
         qml.Hadamard(wires=0)
-        qml.Hadamard(wires=1)
         for wires in range(1,self.__n_qubit_swap):
             qml.CSWAP(wires=[0,wires,wires+self.__n_qubit_swap-1])
         qml.Hadamard(wires=0)
@@ -133,14 +152,15 @@ class Autoencoder():
             qml.Barrier()
             self.autoencoder_fulldense_train(param)
             qml.Barrier()
-            self.original_swap()
-            return qml.probs([0])
+            # self.original_swap()
+            return qml.probs(list(range(self.__n_qubit_trash)))
         
         
         for epoch in range(epochs):
             batch_loss=[]
             for i, X_batch in enumerate([X[i:i + batch_size] for i in range(0, len(X), batch_size)]):
                 def loss_function(w): 
+                    
                     pred =np.array([trainer(w,x)[1] for x in X_batch], requires_grad=True)
                     current_loss = pred.mean()
                     return current_loss
@@ -161,13 +181,16 @@ class Autoencoder():
     def best_params(self):
         return self.__wq[np.argmin(self.__loss)+1] 
     
+    # def autoencoder_fulldense(self,param,wire):
+    #     strprm=0
+    #     for a in range(self.__n_qubit_trash):
+    #         start=wire+a
+    #         current_param=2*(self.__n_qubit_auto-a)
+    #         self.fclayer(self.__n_qubit_auto-a,param[strprm:current_param+strprm],start=start)
+    #         strprm=current_param+strprm
+
     def autoencoder_fulldense(self,param,wire):
-        strprm=0
-        for a in range(self.__n_qubit_trash):
-            start=wire+a
-            current_param=2*(self.__n_qubit_auto-a)
-            self.fclayer(self.__n_qubit_auto-a,param[strprm:current_param+strprm],start=start)
-            strprm=current_param+strprm
+        self.original_auto(self.__n_qubit_auto,param,start=self.__n_qubit_swap+wire)
 
     def get_cirq(self,wire):
         self.autoencoder_fulldense(self.best_params(),wire)

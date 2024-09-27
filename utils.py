@@ -106,3 +106,57 @@ def train_log_depth(X,opt,n_qubit_autoencoder,repetition,epochs,visual=False):
 
 '''
 
+def compare_state_orig(n_qb_input):
+    @qml.qnode(qml.device('default.qubit', wires=n_qb_input*2+1, shots=10000))
+    def pio(param):
+        isotropic_state(param[0],list(range(1,n_qb_input+1)))
+        isotropic_state(param[1],list(range(n_qb_input+1,n_qb_input*2+1)))
+        
+        qml.Barrier()
+        original_swap([(1+a,1+a+n_qb_input) for a in range(n_qb_input)])
+        return qml.probs([0])
+    return pio
+
+def compare_state_ae(n_qb_input,n_qb_trash,ae):
+    @qml.qnode(qml.device('default.qubit', wires=n_qb_input*2+1, shots=10000))
+    def pio(param):
+        isotropic_state(param[0],list(range(1,n_qb_input+1)))
+        isotropic_state(param[1],list(range(n_qb_input+1,n_qb_input*2+1)))
+        
+        qml.Barrier()
+        ae.get_cirq(1)
+        ae.get_cirq(n_qb_input+1)
+
+        qml.Barrier()
+        original_swap([(1+n_qb_trash+a,1+n_qb_trash+a+n_qb_input) for a in range(n_qb_input-n_qb_trash)])
+        return qml.probs([0])
+    return pio
+
+
+def compare_fidelity(n_qubit_autoencoder,n_trash_qubit,ae):
+    c1=[]
+    c2=[]
+    for a in np.linspace(0,1,1000):
+        res1 = compare_state_ae(n_qubit_autoencoder,n_trash_qubit,ae)([a,0])
+        res2 = compare_state_orig(n_qubit_autoencoder)([a,0])
+        c1.append(res1[0])
+        c2.append(res2[0])
+
+    fig, ax = plt.subplots()
+    ax2 = ax.twinx()
+
+    lns1=ax.plot( np.array(range(len(c1)))/100,c1,label=['Reduced'])
+    lns2=ax.plot( np.array(range(len(c2)))/100,c2,label=['Original'])
+    ax.set_ylim((0,1))
+    errors = np.abs(np.array(c2)-np.array(c1))
+    lns3=ax2.plot( np.array(range(len(c2)))/100,errors,label=['Relative error'],color='red')
+    from sklearn.metrics import mean_squared_error as mse 
+    print(f'MSE of the error is {mse(c1,c2)}')
+    ax2.set_ylim([0,1])
+    lns = lns1+lns2+lns3
+    labs = [l.get_label() for l in lns]
+    ax.legend(lns, labs, loc=0)
+    ax.set_xlabel("p")
+    ax.set_ylabel(r"Probability of passing the SWAP test")
+    ax2.set_ylabel(r"Relative error")
+    plt.show();
