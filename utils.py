@@ -11,6 +11,9 @@ from scipy.optimize import minimize
 from IPython.display import clear_output
 import random 
 from pennylane.optimize import AdamOptimizer,QNSPSAOptimizer
+from qutip import *
+from qutip import gates
+import matplotlib.pyplot as plt
 
 
 
@@ -160,3 +163,36 @@ def compare_fidelity(n_qubit_autoencoder,n_trash_qubit,ae):
     ax.set_ylabel(r"Probability of passing the SWAP test")
     ax2.set_ylabel(r"Relative error")
     plt.show();
+
+
+
+def look_Sss(theta,n_qubit):
+    qb=[basis(2, 0) for _ in range(n_qubit)]
+    state = tensor(qb)  # Tensor product of the qubits
+    H=gates.hadamard_transform()
+    hi=[H] + [qeye(2)]*(n_qubit-1)
+    state  = tensor(hi)*state
+    CNOT = gates.cnot()
+    for i in range(n_qubit-1):
+
+        cnoti =[ qeye(2)]*(i) + [CNOT]
+        cnoti += [qeye(2)]*(n_qubit-2-i)
+        state = tensor(cnoti) * state
+        
+    rx = gates.rx(theta)
+    rxx= [rx]*n_qubit
+    state  = tensor(rxx)*state
+    for i in range(n_qubit-1):
+        cnoti =[ qeye(2)]*(i) + [CNOT]
+        cnoti += [qeye(2)]*(n_qubit-2-i)
+        state = tensor(cnoti) * state
+    return state
+look_Sss(np.pi,3)
+
+def get_min_loss_fid(X,qb_input_state,qb_trash_state):
+    a=[]
+    for theta in X:
+        a.append(look_Sss(theta,qb_trash_state))
+    b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
+    c=np.sum(b.eigenenergies()[qb_trash_state-qb_input_state:])
+    return 1 - c 

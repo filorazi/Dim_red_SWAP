@@ -11,11 +11,12 @@ from scipy.optimize import minimize
 from IPython.display import clear_output
 import random 
 from pennylane.optimize import AdamOptimizer,QNSPSAOptimizer
-
+from utils import *
+import os
 
 
 class Autoencoder():
-    def __init__(self,tipe,n_qubit_autoencoder,n_qubit_trash,device):
+    def __init__(self,tipe,n_qubit_autoencoder,n_qubit_trash,device,seed=None):
         '''
             type                string  Define the type of autoencoder, possible values are  fd, ld
             n_qubit_autoencoder int     Dimension of the input space
@@ -23,6 +24,8 @@ class Autoencoder():
         '''
         if tipe not in ['fd']:
             raise Exception('Type not supported')
+        if seed is None:
+            seed=random.random()
         self.__tipe = tipe
         self.__n_qubit_auto = n_qubit_autoencoder
         self.__n_qubit_trash = n_qubit_trash
@@ -31,8 +34,9 @@ class Autoencoder():
         self.__dvc=device
         self.__num_params=sum([ 2*(n_qubit_autoencoder-i)+2 for i in range(n_qubit_trash)])
         self.__num_params=3*n_qubit_autoencoder+n_qubit_autoencoder*(n_qubit_autoencoder-1)
+        random.seed(seed)
         self.__wq=[np.array([random.uniform(0, np.pi) for _ in range(self.__num_params)], requires_grad=True)]
-
+        self.__loss=None
     # def autoencoder_fulldense_train(self,param):
     #     strprm=0
     #     for a in range(self.__n_qubit_trash):
@@ -135,15 +139,17 @@ class Autoencoder():
             qml.Barrier()
             self.autoencoder_fulldense_train(param)
             qml.Barrier()
-            self.original_swap()
-            return qml.probs([0])
+            # self.original_swap()
+            return qml.probs(list(range(self.__n_qubit_swap,self.__n_qubit_swap+self.__n_qubit_trash)))
         
         fig, ax = qml.draw_mpl(trainer)(self.__wq[-1],.5)
         plt.show()
 
 
-    def train(self, X , opt,epochs,batch_size=None):
+    def train(self, X , opt,epochs,batch_size=None,restart=None):
         loss = []   
+        if restart==0 or restart==None:
+            restart=1
         if batch_size is None:
             batch_size=len(X)
         @qml.qnode(self.__dvc,diff_method='adjoint')
@@ -153,23 +159,29 @@ class Autoencoder():
             self.autoencoder_fulldense_train(param)
             qml.Barrier()
             # self.original_swap()
-            return qml.probs(list(range(self.__n_qubit_trash)))
-        
-        
-        for epoch in range(epochs):
-            batch_loss=[]
-            for i, X_batch in enumerate([X[i:i + batch_size] for i in range(0, len(X), batch_size)]):
-                def loss_function(w): 
-                    
-                    pred =np.array([trainer(w,x)[1] for x in X_batch], requires_grad=True)
-                    current_loss = pred.mean()
-                    return current_loss
+            return qml.probs(list(range(self.__n_qubit_swap,self.__n_qubit_swap+self.__n_qubit_trash)))
+        for r in range(restart):
+            for epoch in range(epochs):
+                batch_loss=[]
+                for i, X_batch in enumerate([X[i:i + batch_size] for i in range(0, len(X), batch_size)]):
+                    def loss_function(w): 
+                        pred =np.array([1-trainer(w,x)[0] for x in X_batch], requires_grad=True)
+                        current_loss = pred.mean()
+                        return current_loss
 
-                weights, loss_value = opt.step_and_cost(loss_function, self.__wq[-1])
-                batch_loss.append(loss_value)
-                print(f'Epoch {epoch}, Batch:{i} Loss = {np.mean(batch_loss)}',end='\r')
-            loss.append(np.mean(batch_loss))
-            self.__wq.append(weights)
+                    weights, loss_value = opt.step_and_cost(loss_function, self.__wq[-1])
+                    batch_loss.append(loss_value)
+                    print(f'Epoch {epoch}, Batch:{i} Loss = {np.mean(batch_loss)}',end='\r')
+                loss.append(np.mean(batch_loss))
+                self.__wq.append(weights)
+            # print('resetting')
+            opt.reset()   
+        try:
+            console_size = os.get_terminal_size()
+        except OSError:
+            console_size = 50
+        print('')
+        print('-'*console_size)
         self.__loss=loss
         return loss, self.__wq.copy()
 
@@ -181,16 +193,9 @@ class Autoencoder():
     def best_params(self):
         return self.__wq[np.argmin(self.__loss)+1] 
     
-    # def autoencoder_fulldense(self,param,wire):
-    #     strprm=0
-    #     for a in range(self.__n_qubit_trash):
-    #         start=wire+a
-    #         current_param=2*(self.__n_qubit_auto-a)
-    #         self.fclayer(self.__n_qubit_auto-a,param[strprm:current_param+strprm],start=start)
-    #         strprm=current_param+strprm
-
     def autoencoder_fulldense(self,param,wire):
-        self.original_auto(self.__n_qubit_auto,param,start=self.__n_qubit_swap+wire)
+        strprm=0
+        self.original_auto(self.__n_qubit_auto,param,start=wire)
 
     def get_cirq(self,wire):
         self.autoencoder_fulldense(self.best_params(),wire)
@@ -204,3 +209,6 @@ class Autoencoder():
             plt.plot(range(len(a)),a,label=[i])
             i-=-1
         plt.legend()
+
+    def get_loss(self):
+        return self.__loss
