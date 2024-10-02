@@ -194,5 +194,12 @@ def get_min_loss_fid(X,qb_input_state,qb_trash_state):
     for theta in X:
         a.append(look_Sss(theta,qb_trash_state))
     b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
-    c=np.sum(b.eigenenergies()[qb_trash_state-qb_input_state:])
+    c=np.sum(b.eigenenergies()[-pow(2,qb_input_state-qb_trash_state)-1:])
     return 1 - c 
+
+def get_eigen_loss_values(X,qb_input_state,qb_trash_state):
+    a=[]
+    for theta in X:
+        a.append(look_Sss(theta,qb_trash_state))
+    b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
+    return [1-np.sum(b.eigenenergies()[-a:]) for a in range(pow(2,qb_input_state-qb_trash_state))]
