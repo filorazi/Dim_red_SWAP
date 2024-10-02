@@ -203,3 +203,26 @@ def get_eigen_loss_values(X,qb_input_state,qb_trash_state):
         a.append(look_Sss(theta,qb_trash_state))
     b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
     return [1-np.sum(b.eigenenergies()[-a:]) for a in range(pow(2,qb_input_state-qb_trash_state))]
+
+def delete_following_elements(lst, eta):
+    result = [lst[0]]  
+    i = 0  
+    while i < len(lst) - 1:
+        if abs(lst[i] - lst[i + 1]) > eta:
+            result.append(lst[i + 1])  # Add the next element if the condition holds
+        i += 1  # Move to the next element
+    
+    return [x for x in result if abs(x) >= 0.0001 ]
+
+def get_eigen_loss_values(X,qb_input_state,qb_trash_state):
+    a=[]
+    for theta in X:
+        a.append(look_Sss(theta,qb_input_state))
+    b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
+    
+    c=[]
+    for j in range(pow(2,qb_input_state-qb_trash_state)):
+        c.append(1-np.sum(b.eigenenergies()[-j-1:]))
+
+
+    return c
