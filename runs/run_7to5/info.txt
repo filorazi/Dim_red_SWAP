@@ -1,0 +1,13 @@
+RUN INFORMATION
+Input qubits=7
+Trash qubit=5
+Seed=42
+Optimizer=AdamOptimizer(stepsize=0.2)
+Epochs=150
+Batch sizes=[10, 20, 50, 100]
+Min fidelity loss=0.06197768260131986
+Min loss found=
+				10	:	0.3526663848847622
+				20	:	0.38470809429361885
+				50	:	0.43744221340320644
+				100	:	0.42051911127743535
