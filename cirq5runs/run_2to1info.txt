@@ -1,0 +1,3 @@
+RUN INFORMATION
+This run was performed with direct measurement of the trash qubit and an ansatz Architecture as depicted in figure 6 of the log book
+other informations can be found in the folders for the single runs
