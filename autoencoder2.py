@@ -28,6 +28,7 @@ class Autoencoder_c11():
             seed=random.random()
             self.seed=seed
         self.__tipe = tipe
+        self.__best_w = None
         self.__n_qubit_auto = n_qubit_autoencoder
         self.__n_qubit_trash = n_qubit_trash
         self.__dvc=device
@@ -161,9 +162,10 @@ class Autoencoder_c11():
     # Having said that Ill change this as soon as I 
     # implement the evaluation of the validation set.
     def best_params(self):
-
-        return self.__wq[np.argmin(self.__loss)+1] 
-    
+        if self.__best_w is None:
+            return self.__wq[np.argmin(self.__loss)+1] 
+        else:
+            return self.__best_w
 
     def c11ansatz_ret(self,param,wire):
         
@@ -190,3 +192,6 @@ class Autoencoder_c11():
         return self.__loss
     def get_num_par(self):
         return self.__num_params
+    
+    def set_weight(self, weights):
+        self.__best_w = weights
