@@ -81,10 +81,13 @@ class Autoencoder_composite():
     def create_circ(self,param,p,start=0):
         self.__sp(p,0)
         qml.Barrier()
+        self.create_ansatz(param,start)
+
+    def create_ansatz(self,params,start=0):
         for stage,a in enumerate(self.__stages):
             stage_params = (sum([self.__circuits[self.__stages[a]]['n_par'](self.__n_qubit_auto) for a in range(stage)]),sum([self.__circuits[self.__stages[a]]['n_par'](self.__n_qubit_auto) for a in range(stage+1)]))
 
-            self.__circuits[a]['func'](param[stage_params[0]:stage_params[1]],start)
+            self.__circuits[a]['func'](params[stage_params[0]:stage_params[1]],start)
             qml.Barrier()
 
     def create_isotropic_state(self, p, start):
@@ -216,9 +219,9 @@ class Autoencoder_composite():
 
     def get_cirq(self,wire, params=None):
         if params is None:
-            self.create_circ(self.best_params(),wire)
+            self.create_ansatz(self.best_params(),wire)
         else:
-            self.create_circ(params,wire)
+            self.create_ansatz(params,wire)
     
     def plot_loss(self):
         custom_palette =['#EABFCB','#C191A1','#A4508B','#5F0A87','#2F004F','#120021',]
