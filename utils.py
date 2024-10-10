@@ -110,7 +110,7 @@ def train_log_depth(X,opt,n_qubit_autoencoder,repetition,epochs,visual=False):
 '''
 
 def compare_state_orig(n_qb_input):
-    @qml.qnode(qml.device('default.qubit', wires=n_qb_input*2+1, shots=10000))
+    @qml.qnode(qml.device('default.qubit', wires=n_qb_input*2+1, shots=1000))
     def pio(param):
         isotropic_state(param[0],list(range(1,n_qb_input+1)))
         isotropic_state(param[1],list(range(n_qb_input+1,n_qb_input*2+1)))
@@ -121,7 +121,7 @@ def compare_state_orig(n_qb_input):
     return pio
 
 def compare_state_ae(n_qb_input,n_qb_trash,ae):
-    @qml.qnode(qml.device('default.qubit', wires=n_qb_input*2+1, shots=10000))
+    @qml.qnode(qml.device('default.qubit', wires=n_qb_input*2+1, shots=1000))
     def pio(param):
         isotropic_state(param[0],list(range(1,n_qb_input+1)))
         isotropic_state(param[1],list(range(n_qb_input+1,n_qb_input*2+1)))
@@ -139,7 +139,7 @@ def compare_state_ae(n_qb_input,n_qb_trash,ae):
 def compare_fidelity(n_qubit_autoencoder,n_trash_qubit,ae):
     c1=[]
     c2=[]
-    for a in np.linspace(0,1,1000):
+    for a in np.linspace(0,1,500):
         res1 = compare_state_ae(n_qubit_autoencoder,n_trash_qubit,ae)([a,0])
         res2 = compare_state_orig(n_qubit_autoencoder)([a,0])
         c1.append(res1[0])
