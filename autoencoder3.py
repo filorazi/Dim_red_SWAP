@@ -38,9 +38,8 @@ class Autoencoder_composite():
         self.__num_params_stages= [self.__circuits[cir]['n_par'](n_qubit_autoencoder) for cir in stages]
 
         #set parameter to random values for the first stage and 0 to all the following
-        self.__wq = 0
-        a =[np.array([random.uniform(0, np.pi) for _ in range(self.__num_params_stages[0])] +[0]*(self.__num_params-self.__num_params_stages[0]), requires_grad=True)]
-        print(f'the device has {len(device.wires)} qubits')
+        self.__wq=[np.array([random.uniform(0, np.pi) for _ in range(self.__num_params_stages[0])]+[0]*(self.__num_params-self.__num_params_stages[0]), requires_grad=True)]
+        # print(f'the device has {len(device.wires)} qubits')
     
 
     def original_auto(self,qb,parameter,start):
@@ -196,8 +195,8 @@ class Autoencoder_composite():
                
                 self.__wq.append(np.concatenate([self.__wq[-1][:stage_params[0]], weights, [0]*(self.__num_params-stage_params[1])], axis=0))
 
-                val_pred =np.array([1-trainer(self.__wq[-1],x)[0] for x in X_val], requires_grad=True)
-                val_loss.append(val_pred.mean())
+                val_pred =[1-trainer(self.__wq[-1],x)[0] for x in X_val]
+                val_loss.append(np.mean(val_pred))
                 train_loss.append(np.average(batch_loss,weights=[len(X_batch) for X_batch in [X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]]))
 
                 if epoch > 5 and np.mean(val_loss[-3:])<0.001:
@@ -212,7 +211,7 @@ class Autoencoder_composite():
         print('-'*console_size)
         self.__train_loss=train_loss
         self.__val_loss=val_loss[1:]
-        return train_loss,val_loss, self.__wq.copy()
+        return train_loss,val_loss[1:], self.__wq.copy()
 
     def best_params(self):
         return self.__wq[np.argmin(self.__val_loss)+1] 
@@ -240,7 +239,7 @@ class Autoencoder_composite():
         plt.legend()
 
     def get_loss(self):
-        return self.__loss
+        return self.__train_loss,self.__val_loss
     
     def get_num_par(self):
         return self.__num_params
