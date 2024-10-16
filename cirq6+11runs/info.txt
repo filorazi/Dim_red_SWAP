@@ -1,0 +1,2 @@
+The architectures uses two ansatz trained in two separate stages. The first ansatz is one layer circuit 6 and the second is one layer circuit 11.
+The model doesn't present improvements with respect to others. 

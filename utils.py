@@ -136,7 +136,7 @@ def compare_state_ae(n_qb_input,n_qb_trash,ae):
     return pio
 
 
-def compare_fidelity(n_qubit_autoencoder,n_trash_qubit,ae):
+def compare_fidelity(n_qubit_autoencoder,n_trash_qubit,ae,loc=9):
     c1=[]
     c2=[]
     for a in np.linspace(0,1,500):
@@ -158,7 +158,7 @@ def compare_fidelity(n_qubit_autoencoder,n_trash_qubit,ae):
     ax2.set_ylim([0,1])
     lns = lns1+lns2+lns3
     labs = [l.get_label() for l in lns]
-    ax.legend(lns, labs, loc=0)
+    ax.legend(lns, labs,loc=loc)
     ax.set_xlabel("p")
     ax.set_ylabel(r"Probability of passing the SWAP test")
     ax2.set_ylabel(r"Relative error")
@@ -194,8 +194,9 @@ def get_min_loss_fid(X,qb_input_state,qb_trash_state):
     for theta in X:
         a.append(look_Sss(theta,qb_trash_state))
     b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
+    rank=sum([a>1e-10 for a in b.eigenenergies()])
     c=np.sum(b.eigenenergies()[-pow(2,qb_input_state-qb_trash_state)-1:])
-    return 1 - c 
+    return 1 - c, rank
 
 def get_eigen_loss_values(X,qb_input_state,qb_trash_state):
     a=[]

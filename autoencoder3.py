@@ -36,7 +36,8 @@ class Autoencoder_composite():
         self.__stages = stages
         self.__num_params= sum([self.__circuits[cir]['n_par'](n_qubit_autoencoder) for cir in stages])
         self.__num_params_stages= [self.__circuits[cir]['n_par'](n_qubit_autoencoder) for cir in stages]
-
+        self.__set_weights =None
+        
         #set parameter to random values for the first stage and 0 to all the following
         self.__wq=[np.array([random.uniform(0, np.pi) for _ in range(self.__num_params_stages[0])]+[0]*(self.__num_params-self.__num_params_stages[0]), requires_grad=True)]
         # print(f'the device has {len(device.wires)} qubits')
@@ -216,11 +217,11 @@ class Autoencoder_composite():
     def best_params(self):
         return self.__wq[np.argmin(self.__val_loss)+1] 
 
-    def get_cirq(self,wire, params=None):
-        if params is None:
+    def get_cirq(self,wire):
+        if self.__set_weights is None:
             self.create_ansatz(self.best_params(),wire)
         else:
-            self.create_ansatz(params,wire)
+            self.create_ansatz(self.__set_weights,wire)
     
     def plot_loss(self):
         custom_palette =['#EABFCB','#C191A1','#A4508B','#5F0A87','#2F004F','#120021',]
@@ -243,3 +244,26 @@ class Autoencoder_composite():
     
     def get_num_par(self):
         return self.__num_params
+    
+    def set_weights(self,param):
+        self.__set_weights= param
+    
+    def load(self,path):
+        self.__set_weights=np.load(path+'/weights.npy')
+        self.__train_loss=np.load(path+'/train_loss.npy')
+        self.__val_loss=np.load(path+'/val_loss.npy')
+
+    def get_current_loss(self,X):
+        @qml.qnode(self.__dvc,diff_method='adjoint')
+        def trainer(param,p):
+            self.create_circ(param,p)
+            return qml.probs(list(range(self.__n_qubit_trash)))
+        def loss_function():
+            if self.__set_weights is not None:
+                W=self.__set_weights
+            else:
+                W =self.__wq[-1]
+            pred =np.array([1-trainer(W,x)[0] for x in X], requires_grad=True)
+            current_loss = pred.mean()
+            return current_loss
+        return loss_function()

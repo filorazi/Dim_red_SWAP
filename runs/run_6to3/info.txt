@@ -1,0 +1,20 @@
+RUN INFORMATION
+Input qubits=6
+Trash qubit=3
+Seed=42
+Optimizer=AdamOptimizer(stepsize=0.2)
+Epochs=[125]
+Batch sizes=[10, 20, 50, 100]
+Min fidelity loss=0.0
+Density matrix rank=2
+Min val loss found=
+				10	:	0.18537763233967502
+				20	:	0.12575408628286014
+				50	:	0.09948155326209114
+				100	:	0.1352433747532316
+
+Exec (training) time=
+				10	:	2189.04411816597
+				20	:	2186.124983072281
+				50	:	2171.6418492794037
+				100	:	2194.225660800934
