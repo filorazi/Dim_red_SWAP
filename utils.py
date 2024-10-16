@@ -28,14 +28,14 @@ def original_swap(wires):
 
 def isotropic_state( p, wires):
     qml.Hadamard(wires=wires[0])
-    theta = 2 * np.arccos(np.sqrt(p))
+    theta = p
     for i in wires[:-1]:
         qml.CNOT(wires=[i , 1+i])
     for i in wires:
         qml.RX(theta, wires=i)
     for i in wires[:-1]:
         qml.CNOT(wires=[i , 1+i])
- 
+  
 def destructive_swap(n_qubit):
     for wires in range(n_qubit): 
         qml.CNOT(wires=[wires,wires+n_qubit])
@@ -139,7 +139,7 @@ def compare_state_ae(n_qb_input,n_qb_trash,ae):
 def compare_fidelity(n_qubit_autoencoder,n_trash_qubit,ae,loc=9):
     c1=[]
     c2=[]
-    for a in np.linspace(0,1,500):
+    for a in np.linspace(0,np.pi,500):
         res1 = compare_state_ae(n_qubit_autoencoder,n_trash_qubit,ae)([a,0])
         res2 = compare_state_orig(n_qubit_autoencoder)([a,0])
         c1.append(res1[0])
@@ -166,7 +166,7 @@ def compare_fidelity(n_qubit_autoencoder,n_trash_qubit,ae,loc=9):
 
 
 
-def look_Sss(theta,n_qubit):
+def sp_qutip(theta,n_qubit):
     qb=[basis(2, 0) for _ in range(n_qubit)]
     state = tensor(qb)  # Tensor product of the qubits
     H=gates.hadamard_transform()
@@ -187,21 +187,21 @@ def look_Sss(theta,n_qubit):
         cnoti += [qeye(2)]*(n_qubit-2-i)
         state = tensor(cnoti) * state
     return state
-look_Sss(np.pi,3)
 
 def get_min_loss_fid(X,qb_input_state,qb_trash_state):
     a=[]
     for theta in X:
-        a.append(look_Sss(theta,qb_trash_state))
+        a.append(sp_qutip(theta,qb_input_state))
     b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
     rank=sum([a>1e-10 for a in b.eigenenergies()])
     c=np.sum(b.eigenenergies()[-pow(2,qb_input_state-qb_trash_state)-1:])
-    return 1 - c, rank
+    return 1 - c,  rank
+
 
 def get_eigen_loss_values(X,qb_input_state,qb_trash_state):
     a=[]
     for theta in X:
-        a.append(look_Sss(theta,qb_trash_state))
+        a.append(sp_qutip(theta,qb_input_state))
     b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
     return [1-np.sum(b.eigenenergies()[-a:]) for a in range(pow(2,qb_input_state-qb_trash_state))]
 
@@ -218,7 +218,7 @@ def delete_following_elements(lst, eta):
 def get_eigen_loss_values(X,qb_input_state,qb_trash_state):
     a=[]
     for theta in X:
-        a.append(look_Sss(theta,qb_input_state))
+        a.append(sp_qutip(theta,qb_input_state))
     b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
     
     c=[]
@@ -227,3 +227,13 @@ def get_eigen_loss_values(X,qb_input_state,qb_trash_state):
 
 
     return c
+
+def compute_ovelap_matrix(n_qubit, segm=100):
+    n=[]
+    for a in np.linspace(0,np.pi,segm):
+        nn=[]
+        for b in np.linspace(0,np.pi,segm):
+            nn.append(compare_state_orig(n_qubit)([a,b])[0])
+  
+        n.append(nn)
+    return n 
