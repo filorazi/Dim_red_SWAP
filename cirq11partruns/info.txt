@@ -1,0 +1,4 @@
+RUN INFORMATION
+This run was performed with direct measurement of the trash qubit and an ansatz Architecture based on circuit 11 of the paper 'Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms' 
+the training was performed on just a subset of the possible values of \alpha
+other informations can be found in the folders for the single runs
