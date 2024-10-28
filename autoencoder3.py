@@ -20,7 +20,6 @@ class Autoencoder_composite():
 
     def __init__(self,n_qubit_autoencoder,n_qubit_trash,device,stages=['c6','c11'],seed=None):
 
-        self.__setup()
 
         if seed is None:
             seed=random.random()
@@ -28,12 +27,16 @@ class Autoencoder_composite():
         else:
             self.__seed=seed
         random.seed(seed)
+        if n_qubit_autoencoder not in [4,8]:
+            raise Exception('either 4 or 8 qubit with this state prep')
 
         self.__layers=1
         self.__n_qubit_auto = n_qubit_autoencoder
         self.__n_qubit_trash = n_qubit_trash
         self.__dvc=device
         self.__stages = stages
+        self.__setup()
+
         self.__num_params= sum([self.__circuits[cir]['n_par'](n_qubit_autoencoder) for cir in stages])
         self.__num_params_stages= [self.__circuits[cir]['n_par'](n_qubit_autoencoder) for cir in stages]
         self.__set_weights =None
@@ -70,10 +73,59 @@ class Autoencoder_composite():
             'iso' : {'func':self.create_isotropic_state,
                      'n_par': lambda q : 0
             },
+            'isin' : {'func':self.create_ising_state,
+            'n_par': lambda q : 0
+            }
         }
-        self.__train_loss=None
-        self.__val_loss= None
-        self.__sp = self.__circuits['iso']['func']
+        self.__train_loss={}
+        self.__val_loss= {}
+        self.__sp = self.__circuits['isin']['func']
+
+
+        system_size_x = 1
+        system_size_y = self.__n_qubit_auto
+        system_lattice = "chain"
+        system_periodicity = "closed"
+
+        n_wires =self.__n_qubit_auto
+
+        class dset:
+            sysname = None
+            xlen = 0
+            ylen = 0
+            tuning_parameter_name = None
+            order_parameter_name = None
+            lattice = None
+            periodicity = None
+            tuning_parameters = []
+
+        Ising_dataset = dset()
+        Ising_dataset.sysname = "Ising"
+        Ising_dataset.xlen = system_size_x
+        Ising_dataset.ylen = system_size_y
+        Ising_dataset.lattice = system_lattice
+        Ising_dataset.periodicity = system_periodicity
+        Ising_dataset.tuning_parameter_name = "h"
+        Ising_dataset.order_parameter_name = "mz"
+        current_dataset = Ising_dataset
+
+        self.__data = qml.data.load("qspin", 
+                            sysname=current_dataset.sysname, 
+                            periodicity=current_dataset.periodicity, 
+                            lattice=current_dataset.lattice, 
+                            layout=(current_dataset.xlen, current_dataset.ylen))[0]
+
+        current_dataset.tuning_parameters = self.__data.parameters
+
+
+
+
+
+    def create_ising_state(self,p,start):
+        dm1 = np.matmul( np.matrix(np.conjugate(self.__data.ground_states[p])).T, np.matrix(self.__data.ground_states[p]) )
+        qml.QubitDensityMatrix(dm1, wires=range(self.__n_qubit_auto))
+
+    
 
     def c6ansatz(self,param,start=0):
         self.original_auto(self.__n_qubit_auto,param,start=start)
@@ -173,7 +225,7 @@ class Autoencoder_composite():
             epochs = [epochs]+[0]*(len(self.__stages)-1)
         if len(epochs)>len(self.__stages):
             raise ValueError(f'The number of stage epochs are more than the number of stages')
-        @qml.qnode(self.__dvc,diff_method='adjoint')
+        @qml.qnode(self.__dvc,diff_method='best')
         def trainer(param,p):
             self.create_circ(param,p)
             return qml.probs(list(range(self.__n_qubit_trash)))

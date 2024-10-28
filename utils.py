@@ -14,6 +14,8 @@ from pennylane.optimize import AdamOptimizer,QNSPSAOptimizer
 from qutip import *
 from qutip import gates
 import matplotlib.pyplot as plt
+from pennylane import ApproxTimeEvolution
+from ipywidgets import interactive
 
 
 
@@ -193,7 +195,7 @@ def get_min_loss_fid(X,qb_input_state,qb_trash_state):
     for theta in X:
         a.append(sp_qutip(theta,qb_input_state))
     b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
-    rank=sum([a>1e-10 for a in b.eigenenergies()])
+    rank = np.linalg.matrix_rank(b)
     c=np.sum(b.eigenenergies()[-pow(2,qb_input_state-qb_trash_state)-1:])
     return 1 - c,  rank
 
@@ -228,7 +230,7 @@ def get_eigen_loss_values(X,qb_input_state,qb_trash_state):
 
     return c
 
-def compute_ovelap_matrix(n_qubit, segm=100):
+def plot_numeric_ovelap_matrix(n_qubit, segm=100):
     n=[]
     for a in np.linspace(0,np.pi,segm):
         nn=[]
@@ -236,4 +238,217 @@ def compute_ovelap_matrix(n_qubit, segm=100):
             nn.append(compare_state_orig(n_qubit)([a,b])[0])
   
         n.append(nn)
-    return n 
+    sns.heatmap(n)
+
+def compare_matrix_fidelity(n_qubit_autoencoder,n_trash_qubit,ae,loc=9):
+    m1=[]
+    for b in np.linspace(0,np.pi,50):
+        c1=[]
+        for a in np.linspace(0,np.pi,50):
+            res1 = compare_state_ae(n_qubit_autoencoder,n_trash_qubit,ae)([a,b])
+            c1.append(res1[0])
+        m1.append(c1)
+
+    sns.heatmap(m1,yticklabels=[f'{a:.2f}' for a in np.linspace(0,np.pi,50)],xticklabels=[f'{a:.2f}' for a in np.linspace(0,np.pi,50)])
+    plt.xlabel("Alpha")
+    plt.ylabel("Alpha")
+    plt.show()
+    plot_qutip_ovelap_matrix(n_qubit_autoencoder,50)
+    
+def plot_qutip_ovelap_matrix(n_qubit, segm=100):
+    n=[]
+    for a in np.linspace(0,np.pi,segm):
+        nn=[]
+        for b in np.linspace(0,np.pi,segm): 
+            nn.append(sp_qutip(a,n_qubit).dag()*sp_qutip(b,n_qubit))
+        n.append(nn)
+    n=np.array(n)
+    real_part = np.real(n)
+    imaginary_part = np.imag(n)
+    # sns.heatmap(real_part)
+    # plt.title('Real part')
+    # plt.show()
+    # sns.heatmap(imaginary_part)
+    # plt.title('imaginary_part')
+    # plt.show()
+    sns.heatmap(np.real(np.abs(n)**2),xticklabels=np.linspace(0,np.pi,segm),yticklabels=np.linspace(0,np.pi,segm))
+    plt.title('prob')
+    plt.show()
+
+def avg_and_std(data):
+    # Find the length of the longest sublist
+    print(data)
+    max_length = max(len(sublist) for sublist in data)
+
+    # Initialize lists to store results
+    means = []
+    std_devs = []
+
+    # Iterate over each index (up to max_length)
+    for i in range(max_length):
+        # Collect values at the i-th index, but only from sublists that have this index
+        values_at_i = [sublist[i] for sublist in data if i < len(sublist)]
+        
+        # Calculate mean and std deviation if there are values for this index
+        if values_at_i:
+            mean = np.mean(values_at_i)
+            std = np.std(values_at_i)
+        else:
+            mean = np.nan  # In case there are no values at this index
+            std = np.nan
+        
+        # Store the results
+        means.append(mean)
+        std_devs.append(std)
+
+    return np.array(means), np.array(std_devs)
+
+def get_min_loss_fid_ising(X,qb_input_state,qb_trash_state):
+    a=[]
+    for theta in X:
+        a.append(sp_qutip(theta,qb_input_state))
+    b =np.sum([tensor(c, c.dag()) for c in a])/len(a)
+    rank = np.linalg.matrix_rank(b)
+    c=np.sum(b.eigenenergies()[-pow(2,qb_input_state-qb_trash_state)-1:])
+    return 1 - c,rank
+
+def ising_qutip(p,qb_input_state):
+
+    system_size_x = 1
+    system_size_y = qb_input_state
+    system_periodicity = "closed"
+    system_lattice = "chain"
+    class dset:
+        sysname = None
+        xlen = 0
+        ylen = 0
+        tuning_parameter_name = None
+        order_parameter_name = None
+        lattice = None
+        periodicity = None
+        tuning_parameters = []
+
+    Ising_dataset = dset()
+    Ising_dataset.sysname = "Ising"
+    Ising_dataset.xlen = system_size_x
+    Ising_dataset.ylen = system_size_y
+    Ising_dataset.lattice = system_lattice
+    Ising_dataset.periodicity = system_periodicity
+    Ising_dataset.tuning_parameter_name = "h"
+    Ising_dataset.order_parameter_name = "mz"
+    current_dataset = Ising_dataset
+
+    data = qml.data.load("qspin", 
+                        sysname=current_dataset.sysname, 
+                        periodicity=current_dataset.periodicity, 
+                        lattice=current_dataset.lattice, 
+                        layout=(current_dataset.xlen, current_dataset.ylen))[0]
+
+
+
+    return Qobj( np.matrix(data.ground_states[p]).T )
+
+def interactive_heatmap(n_step, maps, max=255, text = False):
+    '''
+    function to generate an heatmap with slider to see the evolution of an heatmap
+    parameter:
+    -   n_step: number of step for the slider
+    -   
+    '''
+    def f(a):
+        return maps[a]
+
+    def plot(a):
+        z = f(a)
+        plt.figure(figsize=(15,12), dpi=80)
+        sns.heatmap(z, linewidth=0, annot=text)
+
+    return interactive(plot, a=(0,n_step-1,1))
+
+def interactive_prob(n_step, maps, text = False):
+    '''
+    function to generate an heatmap with slider to see the evolution of an heatmap
+    parameter:
+    -   n_step: number of step for the slider
+    -   
+    '''
+    def f(a):
+        return maps[a]
+
+    def plot(a):
+        z = f(a)
+        plt.figure(figsize=(15,12), dpi=80)
+        sns.barplot(x=[bin(n).replace("0b", "") for n in range(2**4)],y=z)
+        plt.ylim([0,1])
+
+    return interactive(plot, a=(0,n_step-1,1))
+
+
+def get_data(n_qubit_autoencoder):
+    system_size_x = 1
+    system_size_y = n_qubit_autoencoder
+    system_lattice = "chain"
+    system_periodicity = "closed"
+
+    n_wires =n_qubit_autoencoder
+    dev = qml.device("default.mixed", wires=n_wires)
+
+    class dset:
+        sysname = None
+        xlen = 0
+        ylen = 0
+        tuning_parameter_name = None
+        order_parameter_name = None
+        lattice = None
+        periodicity = None
+        tuning_parameters = []
+
+    Ising_dataset = dset()
+    Ising_dataset.sysname = "Ising"
+    Ising_dataset.xlen = system_size_x
+    Ising_dataset.ylen = system_size_y
+    Ising_dataset.lattice = system_lattice
+    Ising_dataset.periodicity = system_periodicity
+    Ising_dataset.tuning_parameter_name = "h"
+    Ising_dataset.order_parameter_name = "mz"
+    current_dataset = Ising_dataset
+
+    data = qml.data.load("qspin", 
+                        sysname=current_dataset.sysname, 
+                        periodicity=current_dataset.periodicity, 
+                        lattice=current_dataset.lattice, 
+                        layout=(current_dataset.xlen, current_dataset.ylen))[0]
+
+    current_dataset.tuning_parameters = data.parameters
+    return data
+
+
+def reduced_density_matrix(state, target_qubits, total_qubits):
+    """Compute the reduced density matrix for the specified target_qubits
+    by tracing out all other qubits without reshaping.
+    
+    Args:
+        state (np.ndarray): The full state vector of the system.
+        target_qubits (list): List of qubits to keep in the reduced density matrix.
+        total_qubits (int): The total number of qubits in the system.
+        
+    Returns:
+        np.ndarray: The reduced density matrix for the target qubits.
+    """
+    # Convert state vector to density matrix
+    density_matrix = np.outer(state, np.conj(state))
+
+    # Determine the number of target and traced-out qubits
+    trace_out_qubits = sorted(set(range(total_qubits)) - set(target_qubits))
+    
+    # Start with full density matrix
+    for qubit in trace_out_qubits:
+        # Sum over the indices of the qubit to trace out
+        density_matrix = sum(
+            density_matrix.take([i], axis=qubit).take([i], axis=qubit + total_qubits)
+            for i in range(2)
+        )
+    
+    # Final shape after tracing out unwanted qubits
+    dim = 2 ** len(target_qubits)
+    return density_matrix.reshape((dim, dim))

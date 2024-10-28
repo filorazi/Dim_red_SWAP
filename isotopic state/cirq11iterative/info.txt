@@ -1,0 +1,4 @@
+RUN INFORMATION
+This run was performed with direct measurement of the trash qubit and an ansatz Architecture based on circuit 11 of the paper 'Expressibility and entangling capability of parameterized quantum circuits for hybrid quantum-classical algorithms' 
+The training was done iteratively from n qubit to n-1 to n-2 .... to 1
+other informations can be found in the folders for the single runs
