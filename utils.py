@@ -19,6 +19,12 @@ from ipywidgets import interactive
 
 
 
+def trace_out(state,keep):
+     #keep A list of components to keep after partial trace
+     dims = [[2] * int(np.log2(state.shape[0]))]
+     ob=Qobj(state,dims=[dims,dims])
+     return np.array(ob.ptrace(keep).full(),requires_grad=True)
+
 
 def original_swap(wires):
   qml.Hadamard(wires=0)

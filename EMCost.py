@@ -188,6 +188,16 @@ def get_Pauli_strings(n_system_sites:int, operator_support_list=None,
                         +'a list or an array shorter than the number of sites')
     max_rng = list(max_rng)
 
+    # Generate all Pauli strings
+    Pauli_string_lists = [sites_to_site_op(get_site_combinations(n_system_sites,
+                                                       operator_support_list[i],
+                                                       support_prob_list[i],
+                                                       translation_invariance_Q,
+                                                       max_rng[i],
+                                                       random_shift_sites_Q))
+                          for i in range(len(operator_support_list))]
+    return Pauli_string_lists
+    # Tested and works
 
 
 def get_site_combinations(n_system_sites:int, operator_support:int, support_prob:float,
@@ -256,16 +266,6 @@ def get_site_combinations(n_system_sites:int, operator_support:int, support_prob
     return arr[:n_samples]
     # Tested and works
 
-    # Generate all Pauli strings
-    Pauli_string_lists = [sites_to_site_op(get_site_combinations(n_system_sites,
-                                                       operator_support_list[i],
-                                                       support_prob_list[i],
-                                                       translation_invariance_Q,
-                                                       max_rng[i],
-                                                       random_shift_sites_Q))
-                          for i in range(len(operator_support_list))]
-    return Pauli_string_lists
-    # Tested and works
 
 
 def cost_fn_EM(X,trainer,input_states):
