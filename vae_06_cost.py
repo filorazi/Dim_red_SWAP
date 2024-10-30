@@ -9,12 +9,8 @@ import random
 import copy
 import jax
 import jax.numpy as jnp
-from jax.config import config
-config.update('jax_enable_x64', True)
 import cvxpy
 from functools import partial
-import vae_06_funcs as vaef
-import vae_06_params as vaep
 
 
 # --------------------------
@@ -31,7 +27,7 @@ args = parser.parse_args()
 # DEFINE GLOBAL VARIABLES USED IN THE CURRENT MODULE
 # --------------------------------------------------
 system_params = vaep.args_to_dict(args)
-input_states, data_parameters = vaep.load_states(data_type=system_params['data_type'],
+input_states, data_parameters = vaep.load_states(data_type=system_params['data_type'],#Ising
                                                  num_input_qubits=system_params['num_input_qubits'],
                                                  frac_sampled=system_params['frac_sampled'],
                                                  param_rng_min=system_params['param_rng_min'],
