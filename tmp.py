@@ -18,12 +18,13 @@ from EMCost import *
 def fidelity(X,trainer,input_state,n_qubit_auto,n_qubit_trash):
     def _fidelity(w):
         output_dms =np.array([trace_out(trainer(w,x),range(n_qubit_trash, n_qubit_trash+n_qubit_auto)) for x in X], requires_grad=True)
-        fid=[]
-        for a,b in zip(output_dms,input_state):
-            print(type(qml.math.fidelity(a,b)))
-            fid.append(1-qml.math.fidelity(a,b))
+
+        fid=[1-qml.math.fidelity(a,b, check_state=True) for a,b in zip(output_dms,input_state)]
         return np.mean(np.array(fid))
     return _fidelity
+
+
+
 
 
 class Autoencoder_autodecoder():
@@ -256,9 +257,7 @@ class Autoencoder_autodecoder():
                     print(f'\rStage: {stage}, \tEpoch {epoch+1}, \tBatch:{i}, \tTrain Loss = {np.mean(batch_loss):.6f}, \tVal Loss = {val_loss[-1]:.6f}',end='')
                 self.__wq.append(np.concatenate([self.__wq[-1][:stage_params[0]], weights, [0]*(self.__num_params-stage_params[1])], axis=0))
                 val_l=self.__loss(X_val,trainer,[self.get_input_state(x) for x in X_val],self.__n_qubit_auto,self.__n_qubit_trash) 
-                print(val_l,loss_function)
                 val_loss.append(val_l(self.__wq[-1][stage_params[0]:stage_params[1]]))
-                
                 train_loss.append(np.average(batch_loss,weights=[len(X_batch) for X_batch in [X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]]))
                 if epoch > 5 and np.mean(val_loss[-3:])<0.001:
                     print('\nEarly stop')
@@ -332,43 +331,34 @@ class Autoencoder_autodecoder():
 
 
 
+def trace_out(rho, keep_qubits):
+    """
 
-
-
-
-
-
-
-
-
-def trace_out(state, keep):
-    if isinstance(state, qml.numpy.tensor):  # Handle validation case
-        state = np.array(state)
-    elif isinstance(state, qml.numpy.numpy_boxes.ArrayBox):  # Handle training case
-        state = np.array(state._value)
+    Perform a partial trace over the specified qubits for a given density matrix.
     
-    dims = [2] * int(np.log2(state.shape[0]))
-    ob = Qobj(state, dims=[dims, dims])
-    return np.array(ob.ptrace(keep).full())
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+    Args:
+        rho (qml.numpy.tensor or qml.numpy.numpy_boxes.ArrayBox): The density matrix.
+        keep_qubits (list of int): The indices of the qubits to keep.
+    
+    Returns:
+        qml.numpy.tensor or qml.numpy.numpy_boxes.ArrayBox: The reduced density matrix.
+    """
+    num_qubits = int(np.log2(rho.shape[0]))
+    trace_qubits = [i for i in range(num_qubits) if i not in keep_qubits]
+    
+    # Reshape the density matrix to a tensor with 2*num_qubits dimensions
+    rho_reshaped = np.reshape(rho, [2] * num_qubits * 2)
+    
+    # Perform the partial trace over the qubits to be traced out
+    for qubit in trace_qubits:
+        # Trace out the qubit by summing over the appropriate axes
+        rho_reshaped = np.tensordot(rho_reshaped, np.eye(2), axes=([qubit, qubit + num_qubits], [0, 1]))
+    
+    # Reshape back to a 2D matrix
+    keep_dim = 2 ** len(keep_qubits)
+    reduced_rho = np.reshape(rho_reshaped, (keep_dim, keep_dim))
+    
+    return reduced_rho
 
 
 n_trash_qubit=2
@@ -377,10 +367,43 @@ n_qubit=n_qubit_autoencoder+n_trash_qubit
 dvc = qml.device('default.mixed', wires=n_qubit, shots=None)
 
 ae = Autoencoder_autodecoder(n_qubit_autoencoder,n_trash_qubit,dvc,stages=['c11'])
+
 opt=AdamOptimizer(stepsize=.2)
-X=list(range(3))
+X=list(range(100))
 random.shuffle(X)
 epochs=[37]
 
 ae.train(X,opt,epochs,50,val_split=.33)
  
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
