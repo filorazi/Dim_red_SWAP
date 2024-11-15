@@ -16,14 +16,18 @@ from qutip import gates
 import matplotlib.pyplot as plt
 from pennylane import ApproxTimeEvolution
 from ipywidgets import interactive
+from pennylane.math import reduce_dm
+from jax import numpy as jnp
+
+def fidelity(X,trainer,input_state,n_qubit_auto,n_qubit_trash):
+    def _fidelity(w):
+        output_dms =jnp.array([reduce_dm(trainer(w,x),range(n_qubit_trash, n_qubit_trash+n_qubit_auto)) for x in X])
+
+        fid=[1-qml.math.fidelity(a,b, check_state=True) for a,b in zip(output_dms,input_state)]
+        return jnp.mean(jnp.array(fid))
+    return _fidelity
 
 
-
-def trace_out(state,keep):
-     #keep A list of components to keep after partial trace
-     dims = [[2] * int(np.log2(state.shape[0]))]
-     ob=Qobj(state,dims=[dims,dims])
-     return np.array(ob.ptrace(keep).full(),requires_grad=True)
 
 
 def original_swap(wires):
@@ -428,33 +432,3 @@ def get_data(n_qubit_autoencoder):
     current_dataset.tuning_parameters = data.parameters
     return data
 
-
-def reduced_density_matrix(state, target_qubits, total_qubits):
-    """Compute the reduced density matrix for the specified target_qubits
-    by tracing out all other qubits without reshaping.
-    
-    Args:
-        state (np.ndarray): The full state vector of the system.
-        target_qubits (list): List of qubits to keep in the reduced density matrix.
-        total_qubits (int): The total number of qubits in the system.
-        
-    Returns:
-        np.ndarray: The reduced density matrix for the target qubits.
-    """
-    # Convert state vector to density matrix
-    density_matrix = np.outer(state, np.conj(state))
-
-    # Determine the number of target and traced-out qubits
-    trace_out_qubits = sorted(set(range(total_qubits)) - set(target_qubits))
-    
-    # Start with full density matrix
-    for qubit in trace_out_qubits:
-        # Sum over the indices of the qubit to trace out
-        density_matrix = sum(
-            density_matrix.take([i], axis=qubit).take([i], axis=qubit + total_qubits)
-            for i in range(2)
-        )
-    
-    # Final shape after tracing out unwanted qubits
-    dim = 2 ** len(target_qubits)
-    return density_matrix.reshape((dim, dim))

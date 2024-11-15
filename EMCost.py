@@ -7,38 +7,54 @@ import numbers
 import cvxpy
 import itertools
 import random
+from pennylane.math import reduce_dm
+import jax
+import jax.numpy as jnp
 
 
 system_params={}
-vae_dev_pure_input=None
+vae_dev_mixed_input=None
 vae_dev_mixed_middle=None
 vae_dev_mixed_output=None
 
-def set_global(input_qubits,middle_qubits,output_qubits,operator_support,operator_support_probs,operator_translation_invariance_Q,operator_support_max_range):
+def set_global( num_input_qubits,output_qubits,n_trash_qubits,operator_support,operator_support_probs,operator_translation_invariance_Q,operator_support_max_range,use_jax=True):
     global system_params
-    global vae_dev_pure_input
+    global vae_dev_mixed_input
     global vae_dev_mixed_middle
     global vae_dev_mixed_output
-    system_params={'input_qubits':input_qubits,
-                   'middle_qubits':middle_qubits,
+    system_params={'num_input_qubits': num_input_qubits,
+                #    'middle_qubits':middle_qubits,
                    'output_qubits':output_qubits,
+                   'trash_qubits':n_trash_qubits,
                    'operator_support':operator_support,
                    'operator_support_probs':operator_support_probs,
                    'operator_translation_invariance_Q':operator_translation_invariance_Q,
-                   'operator_support_max_range':operator_support_max_range}
+                   'operator_support_max_range':operator_support_max_range,
+                   'use_jax_Q':use_jax}
     
-    vae_dev_pure_input = qml.device('default.mixed', wires=system_params['input_qubits'])
-    vae_dev_mixed_middle = qml.device('default.mixed', wires=system_params['middle_qubits'])
+    vae_dev_mixed_input = qml.device('default.mixed', wires=system_params['num_input_qubits'])
+    # vae_dev_mixed_middle = qml.device('default.mixed', wires=system_params['middle_qubits'])
     vae_dev_mixed_output = qml.device('default.mixed', wires=system_params['output_qubits'])
 
 # Calculate the expectation value of Pauli strings on input states
+    # Looked the code through, looks good
+
 def expval_operators_input(state_in, operators):
-    @qml.qnode(vae_dev_mixed_middle)
+    @jax.jit
+    def jax__expval_operators_input(state, operators):
+        return expval_operators_input(state, operators)
+    @qml.qnode(vae_dev_mixed_input,interface='jax' if system_params['use_jax_Q'] else 'autograd')
     def _expval_operators_input(state, operators):
         state_op_expval = []
-        qml.QubitDensityMatrix(state, vae_dev_pure_input.wires)
+        qml.QubitDensityMatrix(state, vae_dev_mixed_input.wires)
         return [qml.expval(op) for op in operators]
-    return _expval_operators_input(state_in, operators)
+
+
+    if system_params['use_jax_Q']:
+        return jax__expval_operators_input(state_in, operators)
+    else:
+        return _expval_operators_input(state_in, operators)
+    # Looked the code through, looks good
 
 def sites_to_site_op(sites):
     # Having a list of sites e.g. [[1,3,8], [2,4,7]], we add all possible
@@ -56,13 +72,13 @@ def sites_to_site_op(sites):
     # Tested and works
  
     
-def expval_operators_middle(dm_mid, operators):
-    @qml.qnode(vae_dev_mixed_middle)
-    def _expval_operators_middle(dm_mid, operators):
-        state_op_expval = []
-        qml.QubitDensityMatrix(dm_mid, vae_dev_mixed_middle.wires)
-        return [qml.expval(op) for op in operators]
-    return _expval_operators_middle(dm_mid, operators)
+# def expval_operators_middle(dm_mid, operators):
+#     @qml.qnode(vae_dev_mixed_middle)
+#     def _expval_operators_middle(dm_mid, operators):
+#         state_op_expval = []
+#         qml.QubitDensityMatrix(dm_mid, vae_dev_mixed_middle.wires)
+#         return [qml.expval(op) for op in operators]
+#     return _expval_operators_middle(dm_mid, operators)
 
 
 def expval_operators_output(dm_out, operators):
@@ -117,9 +133,9 @@ def expval_Pauli_strings(states_in_list,
     if in_mid_out_Q=='input':
         for state in states_in_list:
             state_op_expval += [expval_operators_input(state, ops)]
-    elif in_mid_out_Q=='middle':
-        for state in states_in_list:
-            state_op_expval += [expval_operators_middle(state, ops)]
+    # elif in_mid_out_Q=='middle':
+    #     for state in states_in_list:
+    #         state_op_expval += [expval_operators_middle(state, ops)]
     elif in_mid_out_Q=='output':
         for state in states_in_list:
             state_op_expval += [expval_operators_output(state, ops)]
@@ -273,11 +289,12 @@ def cost_fn_EM(X,trainer,input_states):
         cost = 0.
         n_states = len(X)
         # return the density matrix of the autoencoder
-        output_dms =np.array([trainer(w,x) for x in X], requires_grad=True)
+        output_dms =np.array([reduce_dm(trainer(w,x),range(system_params['trash_qubits'], system_params['num_input_qubits']+system_params['trash_qubits']),check_state=True) for x in X], requires_grad=True)
         # for input_state in input_states:
         #     middle_dm, _, expval_Z_traced_qubits = vae_compress(
         #                                             compress_convolution_parameters=compressing_convolutional_params,
-        #                                             compress_pooling_parameters=compressing_pooling_params,
+        #                                             compress_pooling_parameters=compres
+        # sing_pooling_params,
         #                                             state_vector_in=input_state,
         #                                             measure_traced_qubits_Q=(abs(system_params['coeff_traced_cost'])>0),
         #                                             use_SVD_unitary_Q=use_SVD_unitary_Q)
