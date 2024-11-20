@@ -190,16 +190,16 @@ class JAxutoencoder():
             return weights, opt_state, loss
 
         for epoch in range(epochs):
-            batch_loss=[]
+            batch_loss=jnp.array([])
             weights=jnp.array(self.__wq[-1])
             for i, X_batch in enumerate([X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]):
                 weights, opt_state, loss_value = train_step(weights, opt_state, X_batch)
                 batch_loss.append(loss_value)
-                print(f'\rEpoch {epoch+1}, \tBatch:{i}, \tTrain Loss = {np.mean(batch_loss):.6f}, \tVal Loss = {val_loss[-1]:.6f}',end='')
+                print(f'\rEpoch {epoch+1}, \tBatch:{i}, \tTrain Loss = {jnp.mean(batch_loss):.6f}, \tVal Loss = {val_loss[-1]:.6f}',end='')
             self.__wq.append(weights)
             val_l=self.__loss(X_val,trainer,X_val,self.__n_qubit_auto,self.__n_qubit_trash) 
             val_loss.append(val_l(self.__wq[-1]))
-            train_loss.append(np.average(batch_loss,weights=[len(X_batch) for X_batch in [X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]]))
+            train_loss.append(jnp.average(batch_loss,weights=[len(X_batch) for X_batch in [X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]]))
             if epoch > 5 and np.mean(val_loss[-3:])<0.001:
                 print(f'\nEarly stop at epoch {epoch} for perfect training')
                 final_epoch = epoch
