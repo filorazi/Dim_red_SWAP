@@ -184,7 +184,12 @@ class JAxutoencoder():
         @jax.jit
         def train_step(weights,opt_state,data):
             loss_function = self.__loss(data,trainer,data,self.__n_qubit_auto,self.__n_qubit_trash)
+            # print(loss_function(weights))
+            
             loss, grads = jax.value_and_grad(loss_function)(weights)
+            print(f'loss:\n{loss}')
+
+            print(f'grads:\n{grads}')
             updates, opt_state = opt.update(grads, opt_state)
             weights = optax.apply_updates(weights, updates)
             return weights, opt_state, loss

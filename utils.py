@@ -22,7 +22,6 @@ from jax import numpy as jnp
 def fidelity(X,trainer,input_state,n_qubit_auto,n_qubit_trash):
     def _fidelity(w):
         output_dms =jnp.array([reduce_dm(trainer(w,x),range(n_qubit_trash, n_qubit_trash+n_qubit_auto)) for x in X])
-
         fid=[1-qml.math.fidelity(a,b, check_state=True) for a,b in zip(output_dms,input_state)]
         return jnp.mean(jnp.array(fid))
     return _fidelity

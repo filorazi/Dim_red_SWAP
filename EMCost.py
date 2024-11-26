@@ -42,9 +42,10 @@ def set_global( num_input_qubits,output_qubits,n_trash_qubits,operator_support,o
 def expval_operators_input(state_in, operators):
     @jax.jit
     def jax__expval_operators_input(state, operators):
-        return expval_operators_input(state, operators)
+        return _expval_operators_input(state, operators)
     @qml.qnode(vae_dev_mixed_input,interface='jax' if system_params['use_jax_Q'] else 'autograd')
     def _expval_operators_input(state, operators):
+        # print(state.shape,vae_dev_mixed_input.wires)
         state_op_expval = []
         qml.QubitDensityMatrix(state, vae_dev_mixed_input.wires)
         return [qml.expval(op) for op in operators]
@@ -139,7 +140,7 @@ def expval_Pauli_strings(states_in_list,
     elif in_mid_out_Q=='output':
         for state in states_in_list:
             state_op_expval += [expval_operators_output(state, ops)]
-    state_op_expval = np.array(state_op_expval)
+    state_op_expval = jnp.array(state_op_expval)
     return state_op_expval
 
 
@@ -284,12 +285,14 @@ def get_site_combinations(n_system_sites:int, operator_support:int, support_prob
 
 
 
-def cost_fn_EM(X,trainer,input_states):
-    def _cost_fn_EM(w):
+def cost_fn_EM():
+    def _cost_fn_EM(y_real,y_pred):
         cost = 0.
-        n_states = len(X)
+        n_states = len(y_pred)
+        output_dms=y_pred
+        input_states=y_real
         # return the density matrix of the autoencoder
-        output_dms =np.array([reduce_dm(trainer(w,x),range(system_params['trash_qubits'], system_params['num_input_qubits']+system_params['trash_qubits']),check_state=True) for x in X], requires_grad=True)
+        # output_dms =jnp.array([reduce_dm(trainer(w,x),range(system_params['trash_qubits'], system_params['num_input_qubits']+system_params['trash_qubits']),check_state=True) for x in X])
         # for input_state in input_states:
         #     middle_dm, _, expval_Z_traced_qubits = vae_compress(
         #                                             compress_convolution_parameters=compressing_convolutional_params,
@@ -409,7 +412,7 @@ def cost_fn_EM(X,trainer,input_states):
 
         for i_state in range(n_states):
             # expval_output_list_list is of qml.ArrayBox type, hence it needs to be transformed to regular numpy arrays
-            expval_diff = qml.math.toarray(expval_output_list_list[i_state]) - numpy.array(expval_input_list_list[i_state])
+            expval_diff = qml.math.toarray(expval_output_list_list[i_state]) - jnp.array(expval_input_list_list[i_state])
             lin_prog_problem = cvxpy.Problem(cvxpy.Maximize(expval_diff.T @ w), [P_mx @ cvxpy.abs(w) <= 1.])
             lin_prog_problem.solve()
             
