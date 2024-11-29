@@ -1,5 +1,4 @@
 import argparse
-import numpy
 
 
 
@@ -52,4 +51,5 @@ if __name__ == '__main__':
 
 
 '''
-& python single_run.py -ni 8 -nt 1 -b 50 -e 50 -v .2 -sz .2 -of '/runs' -ls 1 2  -lp 1. 1.  -lr 1 5'''
+module load stack/2024-06 python/3.11.6
+python single_run.py -ni 8 -nt 1 -b 50 -e 50 -v .2 -sz .2 -of 'runs' -ls 1 2  -lp 1. 1.  -lr 1 5'''

@@ -117,7 +117,7 @@ d =     '@@@@%%%%#########%%@@@@#=:.. ::...::                                   
 
 for i in range(1000):
     
-    time.sleep(0.25)
+    time.sleep(0.15)
     if i%2==0:
         c=d
     elif i%4==1:
