@@ -1,0 +1,11 @@
+RUN INFORMATION
+Input qubits=4
+Trash qubit=2
+Seed=42
+Optimizer=Optax.adam(stepsize=0.2)
+Epochs=50
+Batch sizes=50
+Loss name=<bound method JAxutoencoder.get_loss_name of <autoencoder6.JAxutoencoder object at 0x14f1072fa050>>
+Val_percentage=0.2
+Min val loss found=0.05986256011461651
+Exec (training) time=14335.744293689728
