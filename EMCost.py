@@ -285,12 +285,12 @@ def get_site_combinations(n_system_sites:int, operator_support:int, support_prob
 
 
 
-def cost_fn_EM():
-    def _cost_fn_EM(y_real,y_pred):
+def cost_fn_EM(X,trainer,input_states):
+    def _cost_fn_EM(w):
         cost = 0.
-        n_states = len(y_pred)
-        output_dms=y_pred
-        input_states=y_real
+        n_states = len(X)
+        # return the density matrix of the autoencoder
+        output_dms =jnp.array([reduce_dm(trainer(w,x),range(system_params['trash_qubits'], system_params['num_input_qubits']+system_params['trash_qubits']),check_state=True) for x in X])
         # return the density matrix of the autoencoder
         # output_dms =jnp.array([reduce_dm(trainer(w,x),range(system_params['trash_qubits'], system_params['num_input_qubits']+system_params['trash_qubits']),check_state=True) for x in X])
         # for input_state in input_states:

@@ -410,7 +410,7 @@ def cost_fn_EM(X,trainer,input_states):
 
         for i_state in range(n_states):
             # expval_output_list_list is of qml.ArrayBox type, hence it needs to be transformed to regular numpy arrays
-            expval_diff = qml.math.toarray(expval_output_list_list[i_state]) - jnp.array(expval_input_list_list[i_state])
+            expval_diff = qml.math.toarray(expval_output_list_list[i_state]) - numpy.array(expval_input_list_list[i_state])
             lin_prog_problem = cvxpy.Problem(cvxpy.Maximize(expval_diff.T @ w), [P_mx @ cvxpy.abs(w) <= 1.])
             lin_prog_problem.solve()
             

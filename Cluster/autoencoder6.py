@@ -69,7 +69,8 @@ class JAxutoencoder():
         self.__train_loss={}
         self.__val_loss= {}
         self.__sp = self.__circuits['isin']['func']
-        self.__loss= self.__losses['fidelity']['func']
+        self.__loss_name='EMdistance'
+        self.__loss= self.__losses[self.__loss_name]['func']
         # self.__data = get_data(self.__n_qubit_auto)
 
     # @jax.jit
@@ -181,9 +182,8 @@ class JAxutoencoder():
             return qml.state()
         opt_state = opt.init(self.__wq[-1])
         
-        @jax.jit
         def train_step(weights,opt_state,data):
-            loss_function = self.__loss(data,trainer,data,self.__n_qubit_auto,self.__n_qubit_trash)
+            loss_function = self.__loss(data,trainer,data)
             # print(loss_function(weights))
             
             loss, grads = jax.value_and_grad(loss_function)(weights)
@@ -203,7 +203,7 @@ class JAxutoencoder():
                 batch_loss.append(loss_value)
                 print(f'\rEpoch {epoch+1}, \tBatch:{i}, \tTrain Loss = {np.mean(batch_loss):.6f}, \tVal Loss = {val_loss[-1]:.6f}',end='')
             self.__wq.append(weights)
-            val_l=self.__loss(X_val,trainer,X_val,self.__n_qubit_auto,self.__n_qubit_trash) 
+            val_l=self.__loss(X_val,trainer,X_val) 
             val_loss.append(val_l(self.__wq[-1]))
             train_loss.append(np.average(batch_loss,weights=[len(X_batch) for X_batch in [X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]]))
             if epoch > 5 and np.mean(val_loss[-3:])<0.001:
@@ -286,3 +286,5 @@ class JAxutoencoder():
         return loss_function()
 
 
+    def get_loss_name(self):
+        return self.__loss_name
