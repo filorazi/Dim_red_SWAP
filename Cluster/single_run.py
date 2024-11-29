@@ -29,7 +29,7 @@ from EMCost import *
 from autoencoder6 import JAxutoencoder
 jax.config.update("jax_enable_x64", True)
 import optax 
-
+os.environ["JAX_PLATFORMS"] = "cpu"
 
 def main():
     param=parse()
