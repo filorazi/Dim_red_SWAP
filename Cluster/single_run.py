@@ -119,7 +119,7 @@ def main():
                     f'Optimizer=Optax.adam(stepsize={param.step_size})\n'\
                     f'Epochs={batch_epochs}\n'\
                     f'Batch sizes={param.batch_size}\n'\
-                    f'Loss name={ae.get_loss_name}\n'\
+                    f'Loss name={ae.get_loss_name()}\n'\
                     f'Val_percentage={param.val_percentage}\n'\
                     f'Min val loss found={min_val_found}\n'\
                     f'Exec (training) time={timek}')
