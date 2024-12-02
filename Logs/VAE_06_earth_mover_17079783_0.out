@@ -1,0 +1,20 @@
+Job runs on node:
+eu-g9-038-2
+REPETITIONS=8
+COSTTYPE=earth-mover
+NUMINPUTQUBITS=8
+NUMMIDDLEQUBIT=1
+EPOCHS=5000
+OPTSTEP=0.2
+BATCHSIZE=10
+VALSPLIT=0.2
+FRACSAMPLEDSTATES=0.25
+LISTOPSUPPORT=1 2 3
+LISTOPSUPPORTPROBS=1. 1. 1.
+LISTOPSUPPORTMAXRANGE=1 5 3
+RUNID=0
+['runs/10/loss_train0', 'runs/10/loss_val0', 'runs/10/weights0']
+Running AE with 8 input qubit and 1 trash qubit in batches of 10
+['runs/10/loss_train0', 'runs/10/loss_val0', 'runs/10/weights0']
+Running AE with 8 input qubit and 1 trash qubit in batches of 10
+job finished
