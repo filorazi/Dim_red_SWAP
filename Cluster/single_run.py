@@ -39,7 +39,7 @@ def main():
     random.shuffle(X)
     data=get_data(param.n_input_qubit)
     def get_input_state(p):
-        return np.outer(np.conjugate(data.ground_states[p]), data.ground_states[p])
+        return np.outer(np.conjugate(data['ground_states'][p]), data['ground_states'][p])
     X=[get_input_state(x) for x in X]
     n_qubit=param.n_input_qubit+param.n_trash_qubit
     dvc = qml.device('default.mixed', wires=n_qubit, shots=None)
