@@ -411,7 +411,6 @@ def get_data_from_h5(n_qubits):
     import h5py
     with h5py.File(f'datasets/qspin/Ising/closed/chain/1x{n_qubits}/Ising_closed_chain_1x{n_qubits}.h5', 'r') as h5_file:
         # List all groups in the file
-        print("Keys:", list(h5_file.keys()))
         # Access data within a specific group
           # Replace with actual path
         df= {'ground_states':{k:v[:] for k, v in h5_file['ground_states'].items()}}
