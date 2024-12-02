@@ -406,15 +406,25 @@ def interactive_prob(n_step, maps, text = False):
 
     return interactive(plot, a=(0,n_step-1,1))
 
+def get_data_from_h5(n_qubits):
+    # Open the HDF5 file
+    import h5py
+    with h5py.File(f'datasets/qspin/Ising/closed/chain/1x{n_qubits}/Ising_closed_chain_1x{n_qubits}.h5', 'r') as h5_file:
+        # List all groups in the file
+        print("Keys:", list(h5_file.keys()))
+        # Access data within a specific group
+          # Replace with actual path
+        df= {'ground_states':{k:v[:] for k, v in h5_file['ground_states'].items()}}
+        # print("Dataset:",  df,[v[:]for k, v in dataset.items()])  # Load dataset into memory
+        return df
 
-def get_data(n_qubit_autoencoder):
+def get_data(n_qubit_autoencoder,download=False):
     system_size_x = 1
     system_size_y = n_qubit_autoencoder
     system_lattice = "chain"
     system_periodicity = "closed"
 
     n_wires =n_qubit_autoencoder
-    dev = qml.device("default.mixed", wires=n_wires)
 
     class dset:
         sysname = None
@@ -435,13 +445,14 @@ def get_data(n_qubit_autoencoder):
     Ising_dataset.tuning_parameter_name = "h"
     Ising_dataset.order_parameter_name = "mz"
     current_dataset = Ising_dataset
+    try:
+        data=get_data_from_h5(n_qubit_autoencoder)
+    except:
+        data = qml.data.load("qspin", 
+                            sysname=current_dataset.sysname, 
+                            periodicity=current_dataset.periodicity, 
+                            lattice=current_dataset.lattice, 
+                            layout=(current_dataset.xlen, current_dataset.ylen))[0]
 
-    data = qml.data.load("qspin", 
-                        sysname=current_dataset.sysname, 
-                        periodicity=current_dataset.periodicity, 
-                        lattice=current_dataset.lattice, 
-                        layout=(current_dataset.xlen, current_dataset.ylen))[0]
-
-    current_dataset.tuning_parameters = data.parameters
     return data
 
