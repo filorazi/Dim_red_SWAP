@@ -413,7 +413,7 @@ def get_data_from_h5(n_qubits):
         # List all groups in the file
         # Access data within a specific group
           # Replace with actual path
-        df= {'ground_states':{k:v[:] for k, v in h5_file['ground_states'].items()}}
+        df= {'ground_states':{int(k):v[:] for k, v in h5_file['ground_states'].items()}}
         # print("Dataset:",  df,[v[:]for k, v in dataset.items()])  # Load dataset into memory
         return df
 
