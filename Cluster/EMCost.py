@@ -1,5 +1,7 @@
 import pennylane as qml
 from pennylane import numpy as np
+import os 
+os.environ["JAX_PLATFORMS"] = "cpu"
 import pennylane as qml
 from pennylane import numpy as np
 import numpy

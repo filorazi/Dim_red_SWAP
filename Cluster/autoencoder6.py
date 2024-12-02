@@ -1,4 +1,7 @@
 import pennylane as qml
+import os 
+os.environ["JAX_PLATFORMS"] = "cpu"
+
 from pennylane import numpy as np
 import pandas as pd
 import jax

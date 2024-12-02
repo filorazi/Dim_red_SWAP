@@ -2,6 +2,8 @@ import argparse
 
 
 
+import os 
+os.environ["JAX_PLATFORMS"] = "cpu"
 
 
 def parse():
