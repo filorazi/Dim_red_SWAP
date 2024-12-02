@@ -13,7 +13,7 @@
 
 
 module purge
-module load anaconda/3/2023.03
+module load stack/2024-06 python/3.11.6
 
 echo "Job runs on node:"
 echo $SLURM_NODELIST
