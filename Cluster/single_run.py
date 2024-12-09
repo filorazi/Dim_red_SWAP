@@ -40,10 +40,14 @@ def main():
     X=list(range(n))
     random.shuffle(X)
     data=get_data(param.n_input_qubit)
-    def get_input_state(p):
-        return np.outer(np.conjugate(data['ground_states'][p]), data['ground_states'][p])
-    X=[get_input_state(x) for x in X]
-    n_qubit=param.n_input_qubit+param.n_trash_qubit
+    # def get_input_state(p):
+    #     return np.outer(np.conjugate(data['ground_states'][p]), data['ground_states'][p])
+    # X=[get_input_state(x) for x in X]
+    X=[data['ground_states'][x] for x in X]
+    
+    
+
+    n_qubit=param.n_input_qubit
     dvc = qml.device('default.mixed', wires=n_qubit, shots=None)
  
 
@@ -73,7 +77,6 @@ def main():
     loss_train_file_name=batch_folder+f'/loss_train{i}'
     loss_val_file_name=batch_folder+f'/loss_val{i}'
     weights_file_name=batch_folder+f'/weights{i}'
-    print([loss_train_file_name, loss_val_file_name, weights_file_name])
     print(f"Running AE with {param.n_input_qubit} input qubit and {param.n_trash_qubit} trash qubit in batches of {param.batch_size}")
     ae = JAxutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
     ae.set_layers(3)

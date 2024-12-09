@@ -37,7 +37,8 @@ def set_global( num_input_qubits,output_qubits,n_trash_qubits,operator_support,o
     vae_dev_mixed_input = qml.device('default.mixed', wires=system_params['num_input_qubits'])
     # vae_dev_mixed_middle = qml.device('default.mixed', wires=system_params['middle_qubits'])
     vae_dev_mixed_output = qml.device('default.mixed', wires=system_params['output_qubits'])
-
+    print(vae_dev_mixed_input.wires)
+    print(vae_dev_mixed_output.wires)
 # Calculate the expectation value of Pauli strings on input states
     # Looked the code through, looks good
 
@@ -287,12 +288,15 @@ def get_site_combinations(n_system_sites:int, operator_support:int, support_prob
 
 
 
+
+
+
 def cost_fn_EM(X,trainer,input_states):
     def _cost_fn_EM(w):
         cost = 0.
         n_states = len(X)
+        output_dms = jnp.array([trainer(w,x) for x in X])
         # return the density matrix of the autoencoder
-        output_dms =jnp.array([reduce_dm(trainer(w,x),range(system_params['trash_qubits'], system_params['num_input_qubits']+system_params['trash_qubits']),check_state=True) for x in X])
         # for input_state in input_states:
         #     middle_dm, _, expval_Z_traced_qubits = vae_compress(
         #                                             compress_convolution_parameters=compressing_convolutional_params,

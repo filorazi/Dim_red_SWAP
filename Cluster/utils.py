@@ -27,6 +27,8 @@ def block(arg):
     print(arg)
     print('='*50)
 
+def create_dm(sv):
+    return [jnp.outer(jnp.conjugate(jnp.array(k)),jnp.array(k) )for k in sv]
 
 def fidelity(X,trainer,input_state,n_qubit_auto,n_qubit_trash):
     def _fidelity(w):
