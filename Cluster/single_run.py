@@ -37,7 +37,6 @@ import optax
 def main():
     param=parse()
     n=100
-    opt = optax.adam(param.step_size)
     X=list(range(n))
     random.shuffle(X)
     data=get_data(param.n_input_qubit)
@@ -81,8 +80,11 @@ def main():
     print(f"Running AE with {param.n_input_qubit} input qubit and {param.n_trash_qubit} trash qubit in batches of {param.batch_size}")
     if param.jax:
         ae = JAxutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
+        opt=AdamOptimizer(stepsize=param.step_size)
     else :
         ae = Axutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
+        opt = optax.adam(param.step_size)
+
     ae.set_layers(3)
 
 

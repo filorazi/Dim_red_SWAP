@@ -198,26 +198,23 @@ class Axutoencoder():
         def trainer(param,dm):
             return  self.exec_circ(param,dm)
 
-        opt_state = opt.init(self.__wq[-1])
         
-        def train_step(weights,opt_state,data):
+        def train_step(weights,data):
             loss_function = self.__loss(data,trainer,create_dm(data))
             # print(loss_function(weights))
             
-            loss, grads = opt.step_and_cost(loss_function)(weights)
+            loss, weights = opt.step_and_cost(loss_function,weights)
             # print(f'loss:\n{loss}')
 
             # print(f'grads:\n{grads}')
-            updates, opt_state = opt.update(grads, opt_state)
-            weights = optax.apply_updates(weights, updates)
-            return weights, opt_state, loss
+            return weights, loss
 
 
         for epoch in range(epochs):
             batch_loss=[]
             weights=jnp.array(self.__wq[-1])
             for i, X_batch in enumerate([X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]):
-                weights, opt_state, loss_value = train_step(weights, opt_state, X_batch)
+                weights, loss_value = train_step(weights, X_batch)
                 batch_loss.append(loss_value)
                 print(f'\rEpoch {epoch+1}, \tBatch:{i}, \tTrain Loss = {np.mean(batch_loss):.6f}, \tVal Loss = {val_loss[-1]:.6f}',end='')
             self.__wq.append(weights)
