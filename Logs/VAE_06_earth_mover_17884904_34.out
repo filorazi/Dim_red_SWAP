@@ -1,23 +1,0 @@
-Job runs on node:
-eu-g5-044-2
-REPETITIONS=8
-COSTTYPE=earth-mover
-NUMINPUTQUBITS=8
-NUMMIDDLEQUBIT=2
-EPOCHS=5000
-OPTSTEP=0.2
-BATCHSIZE=100
-VALSPLIT=0.2
-FRACSAMPLEDSTATES=0.25
-LISTOPSUPPORT=1 2 3
-LISTOPSUPPORTPROBS=1. 1. 1.
-LISTOPSUPPORTMAXRANGE=1 5 3
-RUNID=4
-srun -N 1 -n 1 python Cluster/single_run.py -ni 8 -nt 2 -b 100 -e 5000 -v 0.2 -sz 0.2 -of 'runs' -ls 1 2 3  -lp 1. 1. 1.  -lr 1 5 3
-Wires([0, 1, 2, 3, 4, 5, 6, 7])
-Wires([0, 1, 2, 3, 4, 5, 6, 7])
-Running AE with 8 input qubit and 2 trash qubit in batches of 100
-Epoch 1, 	Batch:0, 	Train Loss = 1.910280, 	Val Loss = 0.000000Wires([0, 1, 2, 3, 4, 5, 6, 7])
-Wires([0, 1, 2, 3, 4, 5, 6, 7])
-Running AE with 8 input qubit and 2 trash qubit in batches of 100
-Epoch 1, 	Batch:0, 	Train Loss = 2.083067, 	Val Loss = 0.000000job finished
