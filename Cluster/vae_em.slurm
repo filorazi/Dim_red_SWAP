@@ -1,11 +1,11 @@
 #!/bin/bash -l
 
-#SBATCH --nodes=1
+#SBATCH --nodes=2
 #SBATCH --ntasks-per-node=1
 # #SBATCH --begin=2021-07-10T02:00:00 # Defer start to this much time
 #SBATCH --time=7-00:00:00 # Runtime in D-HH:MM:SS
 #SBATCH --mem-per-cpu=32000 # Memory pool for all cores (see also --mem-per-cpu)
-#SBATCH --array=0-39
+#SBATCH --array=0-1
 #SBATCH -o ./Logs/VAE_06_earth_mover_%A_%a.out # File to which STDOUT will be written
 #SBATCH -e ./Logs/VAE_06_earth_mover_%A_%a.err # File to which STDERR will be written
 #SBATCH --mail-type=FAIL # Type of email notification- BEGIN,END,FAIL,ALL
