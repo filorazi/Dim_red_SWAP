@@ -16,7 +16,7 @@ def parse():
     parser.add_argument('-b', '--batch_size',dest='batch_size',type=int, default=50)      # option that takes a value
     parser.add_argument('-e', '--epochs',dest= 'epochs',type=int, default=10)  # on/off flag
     parser.add_argument('--seed',default=42,dest= 'seed',type=int)
-    parser.add_argument('-v', '--val_percentage',dest='val_percentage' ,help='validation set percentage', type=float, default=0.0)
+    parser.add_argument('-v', '--val_percentage',dest='val_percentage' ,help='validation set percentage', type=float, default=1)
     parser.add_argument('-sz', '--step_size',dest= 'step_size',type=float, default=.2)
     parser.add_argument('-of','--output_folder',dest= 'output_folder', default='tmpfold')
     parser.add_argument('-io','--image_output',dest='image_output' ,action='store_true', default=1)

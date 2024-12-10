@@ -1,23 +1,0 @@
-Job runs on node:
-eu-g9-045-1
-REPETITIONS=8
-COSTTYPE=earth-mover
-NUMINPUTQUBITS=8
-NUMMIDDLEQUBIT=3
-EPOCHS=5000
-OPTSTEP=0.2
-BATCHSIZE=10
-VALSPLIT=0.2
-FRACSAMPLEDSTATES=0.25
-LISTOPSUPPORT=1 2 3
-LISTOPSUPPORTPROBS=1. 1. 1.
-LISTOPSUPPORTMAXRANGE=1 5 3
-RUNID=2
-srun -N 1 -n 1 python Cluster/single_run.py -ni 8 -nt 3 -b 10 -e 5000 -v 0.2 -sz 0.2 -of 'runs' -ls 1 2 3  -lp 1. 1. 1.  -lr 1 5 3
-Wires([0, 1, 2, 3, 4, 5, 6, 7])
-Wires([0, 1, 2, 3, 4, 5, 6, 7])
-Running AE with 8 input qubit and 3 trash qubit in batches of 10
-Epoch 1, 	Batch:0, 	Train Loss = 1.626257, 	Val Loss = 0.000000Epoch 1, 	Batch:1, 	Train Loss = 1.989377, 	Val Loss = 0.000000Epoch 1, 	Batch:2, 	Train Loss = 2.046693, 	Val Loss = 0.000000Epoch 1, 	Batch:3, 	Train Loss = 1.884009, 	Val Loss = 0.000000Epoch 1, 	Batch:4, 	Train Loss = 1.758227, 	Val Loss = 0.000000Epoch 1, 	Batch:5, 	Train Loss = 1.646927, 	Val Loss = 0.000000Epoch 1, 	Batch:6, 	Train Loss = 1.577570, 	Val Loss = 0.000000Epoch 1, 	Batch:7, 	Train Loss = 1.532385, 	Val Loss = 0.000000Wires([0, 1, 2, 3, 4, 5, 6, 7])
-Wires([0, 1, 2, 3, 4, 5, 6, 7])
-Running AE with 8 input qubit and 3 trash qubit in batches of 10
-Epoch 1, 	Batch:0, 	Train Loss = 1.936768, 	Val Loss = 0.000000Epoch 1, 	Batch:1, 	Train Loss = 1.877494, 	Val Loss = 0.000000Epoch 1, 	Batch:2, 	Train Loss = 2.210010, 	Val Loss = 0.000000Epoch 1, 	Batch:3, 	Train Loss = 2.222439, 	Val Loss = 0.000000Epoch 1, 	Batch:4, 	Train Loss = 2.130510, 	Val Loss = 0.000000Epoch 1, 	Batch:5, 	Train Loss = 2.019385, 	Val Loss = 0.000000Epoch 1, 	Batch:6, 	Train Loss = 1.908913, 	Val Loss = 0.000000Epoch 1, 	Batch:7, 	Train Loss = 1.818451, 	Val Loss = 0.000000job finished

@@ -37,9 +37,7 @@ def set_global( num_input_qubits,output_qubits,n_trash_qubits,operator_support,o
     vae_dev_mixed_input = qml.device('default.mixed', wires=system_params['num_input_qubits'])
     # vae_dev_mixed_middle = qml.device('default.mixed', wires=system_params['middle_qubits'])
     vae_dev_mixed_output = qml.device('default.mixed', wires=system_params['output_qubits'])
-    print(vae_dev_mixed_input.wires)
-    print(vae_dev_mixed_output.wires)
-# Calculate the expectation value of Pauli strings on input states
+    # Calculate the expectation value of Pauli strings on input states
     # Looked the code through, looks good
 
 def expval_operators_input(state_in, operators):

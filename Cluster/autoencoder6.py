@@ -225,7 +225,7 @@ class JAxutoencoder():
                 print(f'\rEpoch {epoch+1}, \tBatch:{i}, \tTrain Loss = {np.mean(batch_loss):.6f}, \tVal Loss = {val_loss[-1]:.6f}',end='')
             self.__wq.append(weights)
             if X_val!=[]:
-                val_l=self.__loss(X_val,trainer,X_val) 
+                val_l=self.__loss(X_val,trainer,create_dm(X_val)) 
                 val_loss.append(val_l(self.__wq[-1]))
             else:
                 val_loss.append(1000)
