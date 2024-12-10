@@ -1,0 +1,141 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+Traceback (most recent call last):
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 161, in <module>
+    main()
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 86, in main
+    _=ae.train(X,opt,param.epochs,param.batch_size,val_split=param.val_percentage)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder6.py", line 229, in train
+    val_loss.append(val_l(self.__wq[-1]))
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 390, in _cost_fn_EM
+    expval_input_list_list = expval_Pauli_strings(input_states,
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 139, in expval_Pauli_strings
+    state_op_expval += [expval_operators_input(state, ops)]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 58, in expval_operators_input
+    return jax__expval_operators_input(state_in, operators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 48, in jax__expval_operators_input
+    return _expval_operators_input(state, operators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 987, in __call__
+    return self._impl_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 977, in _impl_call
+    res = self._execution_component(args, kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 935, in _execution_component
+    res = qml.execute(
+          ^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/execution.py", line 523, in execute
+    results = inner_execute(tapes)
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/execution.py", line 202, in inner_execute
+    results = device.execute(transformed_tapes, execution_config=execution_config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/modifiers/single_tape_support.py", line 32, in execute
+    results = batch_execute(self, circuits, execution_config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/legacy_facade.py", line 377, in execute
+    return _set_shots(dev, first_shot)(dev.batch_execute)(circuits, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/software/stacks/2024-06/spack/opt/spack/linux-ubuntu22.04-x86_64_v3/gcc-12.2.0/python-3.11.6-ukhwpjnwzzzizek3pgr75zkbhxros5fq/lib/python3.11/contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/_qubit_device.py", line 488, in batch_execute
+    res = self.execute(circuit, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/logging/decorators.py", line 61, in wrapper_entry
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/default_mixed.py", line 772, in execute
+    return super().execute(circuit, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/_qubit_device.py", line 276, in execute
+    self.apply(
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/logging/decorators.py", line 61, in wrapper_entry
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/default_mixed.py", line 787, in apply
+    self._apply_operation(operation)
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/default_mixed.py", line 695, in _apply_operation
+    self._apply_density_matrix(operation.parameters[0], wires)
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/default_mixed.py", line 554, in _apply_density_matrix
+    raise ValueError("Density matrix must be of length (2**wires, 2**wires)")
+ValueError: Density matrix must be of length (2**wires, 2**wires)
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+srun: error: eu-g9-045-1: task 0: Exited with exit code 1
+srun: Job 17902809 step creation temporarily disabled, retrying (Requested nodes are busy)
+srun: Step created for StepId=17902809.1
+Traceback (most recent call last):
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 161, in <module>
+    main()
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 86, in main
+    _=ae.train(X,opt,param.epochs,param.batch_size,val_split=param.val_percentage)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder6.py", line 229, in train
+    val_loss.append(val_l(self.__wq[-1]))
+                    ^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 390, in _cost_fn_EM
+    expval_input_list_list = expval_Pauli_strings(input_states,
+                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 139, in expval_Pauli_strings
+    state_op_expval += [expval_operators_input(state, ops)]
+                        ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 58, in expval_operators_input
+    return jax__expval_operators_input(state_in, operators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 48, in jax__expval_operators_input
+    return _expval_operators_input(state, operators)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 987, in __call__
+    return self._impl_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 977, in _impl_call
+    res = self._execution_component(args, kwargs)
+        ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 935, in _execution_component
+    res = qml.execute(
+          ^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/execution.py", line 523, in execute
+    results = inner_execute(tapes)
+              ^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/execution.py", line 202, in inner_execute
+    results = device.execute(transformed_tapes, execution_config=execution_config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/modifiers/single_tape_support.py", line 32, in execute
+    results = batch_execute(self, circuits, execution_config)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/legacy_facade.py", line 377, in execute
+    return _set_shots(dev, first_shot)(dev.batch_execute)(circuits, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/software/stacks/2024-06/spack/opt/spack/linux-ubuntu22.04-x86_64_v3/gcc-12.2.0/python-3.11.6-ukhwpjnwzzzizek3pgr75zkbhxros5fq/lib/python3.11/contextlib.py", line 81, in inner
+    return func(*args, **kwds)
+           ^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/_qubit_device.py", line 488, in batch_execute
+    res = self.execute(circuit, **kwargs)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/logging/decorators.py", line 61, in wrapper_entry
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/default_mixed.py", line 772, in execute
+    return super().execute(circuit, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/_qubit_device.py", line 276, in execute
+    self.apply(
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/logging/decorators.py", line 61, in wrapper_entry
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/default_mixed.py", line 787, in apply
+    self._apply_operation(operation)
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/default_mixed.py", line 695, in _apply_operation
+    self._apply_density_matrix(operation.parameters[0], wires)
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/devices/default_mixed.py", line 554, in _apply_density_matrix
+    raise ValueError("Density matrix must be of length (2**wires, 2**wires)")
+ValueError: Density matrix must be of length (2**wires, 2**wires)
+--------------------
+For simplicity, JAX has removed its internal frames from the traceback of the following exception. Set JAX_TRACEBACK_FILTERING=off to include these.
+srun: error: eu-g9-045-1: task 0: Exited with exit code 1
