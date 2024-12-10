@@ -1,0 +1,29 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+Traceback (most recent call last):
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 165, in <module>
+    main()
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 90, in main
+    _=ae.train(X,opt,param.epochs,param.batch_size,val_split=param.val_percentage)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 220, in train
+    weights, opt_state, loss_value = train_step(weights, opt_state, X_batch)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 207, in train_step
+    loss, grads = opt.step_and_cost(loss_function)(weights)
+                  ^^^^^^^^^^^^^^^^^
+AttributeError: 'GradientTransformationExtraArgs' object has no attribute 'step_and_cost'
+srun: error: eu-g9-018-2: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 165, in <module>
+    main()
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 90, in main
+    _=ae.train(X,opt,param.epochs,param.batch_size,val_split=param.val_percentage)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 220, in train
+    weights, opt_state, loss_value = train_step(weights, opt_state, X_batch)
+                                     ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 207, in train_step
+    loss, grads = opt.step_and_cost(loss_function)(weights)
+                  ^^^^^^^^^^^^^^^^^
+AttributeError: 'GradientTransformationExtraArgs' object has no attribute 'step_and_cost'
+srun: error: eu-g9-018-2: task 0: Exited with exit code 1
