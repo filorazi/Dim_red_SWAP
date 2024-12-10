@@ -203,7 +203,7 @@ class Axutoencoder():
             loss_function = self.__loss(data,trainer,create_dm(data))
             # print(loss_function(weights))
             
-            loss, weights = opt.step_and_cost(loss_function,weights)
+            weights,loss  = opt.step_and_cost(loss_function,weights)
             # print(f'loss:\n{loss}')
 
             # print(f'grads:\n{grads}')

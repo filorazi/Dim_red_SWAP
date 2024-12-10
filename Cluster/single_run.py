@@ -61,7 +61,6 @@ def main():
             True,
             param.list_op_support_max_range,
             use_jax=param.jax)
-
     # train_batch_losses={}
     # val_batch_losses={}
     # batch_times={}
