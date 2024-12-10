@@ -98,13 +98,13 @@ class JAxutoencoder():
 
 
     def exec_circ(self,param,dm,start=0):
-        @qml.qnode(self.dev)
+        @qml.qnode(self.dev,interface="jax")
         def _sp_enc(param,dm,start):
             self.__sp(dm,0)
             qml.Barrier()
             self.create_encoder(param,start)
             return qml.density_matrix(list(range(self.__n_qubit_trash,self.__n_qubit_auto)))
-        @qml.qnode(self.dev)
+        @qml.qnode(self.dev,interface="jax")
         def _dec(param,dm,start):
             qml.QubitDensityMatrix(dm,wires=list(range(self.__n_qubit_trash,self.__n_qubit_auto)))
 
@@ -176,7 +176,7 @@ class JAxutoencoder():
 
     def plot_cirq(self):
 
-        @qml.qnode(self.dev)
+        @qml.qnode(self.dev, interface='jax')
         def trainer(param,p):
             self.create_circ(param,p)
         fig, ax = qml.draw_mpl(trainer)(self.__wq[-1],.5)

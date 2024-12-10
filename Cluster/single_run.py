@@ -29,6 +29,7 @@ import random
 from utils import *
 import os
 from EMCost import *
+from autoencoder7 import Axutoencoder
 from autoencoder6 import JAxutoencoder
 jax.config.update("jax_enable_x64", True)
 import optax 
@@ -58,7 +59,7 @@ def main():
             param.list_op_support_probs,
             True,
             param.list_op_support_max_range,
-            use_jax=True)
+            use_jax=param.jax)
 
     # train_batch_losses={}
     # val_batch_losses={}
@@ -78,7 +79,10 @@ def main():
     loss_val_file_name=batch_folder+f'/loss_val{i}'
     weights_file_name=batch_folder+f'/weights{i}'
     print(f"Running AE with {param.n_input_qubit} input qubit and {param.n_trash_qubit} trash qubit in batches of {param.batch_size}")
-    ae = JAxutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
+    if param.jax:
+        ae = JAxutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
+    else :
+        ae = Axutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
     ae.set_layers(3)
 
 

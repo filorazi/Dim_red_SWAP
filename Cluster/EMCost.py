@@ -84,7 +84,7 @@ def sites_to_site_op(sites):
 
 
 def expval_operators_output(dm_out, operators):
-    @qml.qnode(vae_dev_mixed_output)
+    @qml.qnode(vae_dev_mixed_output,interface='jax' if system_params['use_jax_Q'] else 'autograd')
     def _expval_operators_output(dm_out, operators):
         state_op_expval = []
         qml.QubitDensityMatrix(dm_out, vae_dev_mixed_output.wires)

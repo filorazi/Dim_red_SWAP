@@ -1,9 +1,8 @@
 import pennylane as qml
-from pennylane import numpy as np
 import os 
-os.environ["JAX_PLATFORMS"] = "cpu"
+
+from pennylane import numpy as np
 import pandas as pd
-import jax
 import seaborn as sns
 import matplotlib.pyplot as plt
 import seaborn as sns
@@ -17,13 +16,12 @@ from utils import *
 import os
 from EMCost import *
 from pennylane.math import reduce_dm
-from jax import numpy as jnp
 import optax 
 
-#autoencoder con jax
+#autoencoder senza  jax
 
 
-class JAxutoencoder():
+class Axutoencoder():
    
 
     def __init__(self,n_qubit_autoencoder,n_qubit_trash,device,circ='c11',seed=None):
@@ -40,7 +38,7 @@ class JAxutoencoder():
         self.__n_qubit_auto = n_qubit_autoencoder
         self.__n_qubit_trash = n_qubit_trash
         self.__n_qubit=n_qubit_autoencoder+n_qubit_trash
-        self.__dvc=device
+        self.dev=device
         self.__setup()
         self.__circ = circ
         self.__num_params= self.__circuits[circ]['n_par'](n_qubit_autoencoder)
@@ -81,7 +79,7 @@ class JAxutoencoder():
 
 
     def create_ising_state(self,dm1,start=0):
-        qml.QubitDensityMatrix(dm1, wires=range(start,self.__n_qubit_auto+start))
+        qml.QubitStateVector(dm1, wires=range(start,self.__n_qubit_auto+start))
 
     
 
@@ -92,6 +90,27 @@ class JAxutoencoder():
         self.__sp(dm,0)
         qml.Barrier()
         self.create_encoder(param,start)
+        qml.Barrier()
+        self.create_decoder(param,start)
+
+
+    def exec_circ(self,param,dm,start=0):
+        @qml.qnode(self.dev)
+        def _sp_enc(param,dm,start):
+            self.__sp(dm,0)
+            qml.Barrier()
+            self.create_encoder(param,start)
+            return qml.density_matrix(list(range(self.__n_qubit_trash,self.__n_qubit_auto)))
+        @qml.qnode(self.dev)
+        def _dec(param,dm,start):
+            qml.QubitDensityMatrix(dm,wires=list(range(self.__n_qubit_trash,self.__n_qubit_auto)))
+
+            def f():
+                self.__circuits[self.__circ]['func'](param,start)
+            qml.adjoint(f)()
+            return qml.state()
+        
+        return _dec(param,_sp_enc(param,dm,start),start)
 
 
     def create_encoder(self,params,start=0):
@@ -154,7 +173,7 @@ class JAxutoencoder():
 
     def plot_cirq(self):
 
-        @qml.qnode(self.__dvc)
+        @qml.qnode(self.dev)
         def trainer(param,p):
             self.create_circ(param,p)
         fig, ax = qml.draw_mpl(trainer)(self.__wq[-1],.5)
@@ -176,18 +195,16 @@ class JAxutoencoder():
         if type(epochs) is not int:
             raise ValueError(f'Epochs should be a integer not a {type(epochs)}')
 
-        @qml.qnode(self.__dvc, interface="jax")
         def trainer(param,dm):
-            self.create_circ(param,dm)
-            return qml.state()
+            return  self.exec_circ(param,dm)
+
         opt_state = opt.init(self.__wq[-1])
         
         def train_step(weights,opt_state,data):
-            #Remember to change the EM function
-            loss_function = self.__loss(data,trainer,[1]+[0]*(2**self.__n_qubit_trash-1))
+            loss_function = self.__loss(data,trainer,create_dm(data))
             # print(loss_function(weights))
             
-            loss, grads = jax.value_and_grad(loss_function)(weights)
+            loss, grads = opt.step_and_cost(loss_function)(weights)
             # print(f'loss:\n{loss}')
 
             # print(f'grads:\n{grads}')
@@ -204,8 +221,11 @@ class JAxutoencoder():
                 batch_loss.append(loss_value)
                 print(f'\rEpoch {epoch+1}, \tBatch:{i}, \tTrain Loss = {np.mean(batch_loss):.6f}, \tVal Loss = {val_loss[-1]:.6f}',end='')
             self.__wq.append(weights)
-            val_l=self.__loss(X_val,trainer,X_val) 
-            val_loss.append(val_l(self.__wq[-1]))
+            if X_val!=[]:
+                val_l=self.__loss(X_val,trainer,create_dm(X_val)) 
+                val_loss.append(val_l(self.__wq[-1]))
+            else:
+                val_loss.append(1000)
             train_loss.append(np.average(batch_loss,weights=[len(X_batch) for X_batch in [X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]]))
             if epoch > 5 and np.mean(val_loss[-3:])<0.001:
                 print(f'\nEarly stop at epoch {epoch} for perfect training')
@@ -272,7 +292,7 @@ class JAxutoencoder():
         self.__val_loss=np.load(path+'/val_loss.npy')
 
     def get_current_loss(self,X):
-        @qml.qnode(self.__dvc,diff_method='adjoint')
+        @qml.qnode(self.dev,diff_method='adjoint')
         def trainer(param,p):
             self.create_circ(param,p)
             return qml.probs(list(range(self.__n_qubit_trash)))

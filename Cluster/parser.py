@@ -20,6 +20,7 @@ def parse():
     parser.add_argument('-sz', '--step_size',dest= 'step_size',type=float, default=.2)
     parser.add_argument('-of','--output_folder',dest= 'output_folder', default='tmpfold')
     parser.add_argument('-io','--image_output',dest='image_output' ,action='store_true', default=1)
+    parser.add_argument('-jx','--jax',dest='jax' ,action='store_false')
     parser.add_argument('-fs','--frac_sampled',dest='frac_sampled' ,type=int, default=1)
     parser.add_argument('-ls','--list-op-support', required=False, type=int, default=[1],
                         nargs='*', dest='list_op_support',
