@@ -1,0 +1,137 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+Traceback (most recent call last):
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 171, in <module>
+    main()
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 96, in main
+    _=ae.train(X,opt,param.epochs,param.batch_size,val_split=param.val_percentage)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 217, in train
+    weights, loss_value = train_step(weights, X_batch)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 206, in train_step
+    loss, weights = opt.step_and_cost(loss_function,weights)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/optimize/gradient_descent.py", line 64, in step_and_cost
+    g, forward = self.compute_grad(objective_fn, args, kwargs, grad_fn=grad_fn)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/optimize/gradient_descent.py", line 122, in compute_grad
+    grad = g(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/_grad.py", line 221, in __call__
+    self._forward = self._fun(*args, **kwargs)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 296, in _cost_fn_EM
+    output_dms = jnp.array([trainer(w,x) for x in X])
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 296, in <listcomp>
+    output_dms = jnp.array([trainer(w,x) for x in X])
+                            ^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 199, in trainer
+    return  self.exec_circ(param,dm)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 113, in exec_circ
+    return _dec(param,_sp_enc(param,dm,start),start)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 987, in __call__
+    return self._impl_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 963, in _impl_call
+    self.construct(args, kwargs)
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/logging/decorators.py", line 61, in wrapper_entry
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 857, in construct
+    self._qfunc_output = self.func(*args, **kwargs)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 102, in _sp_enc
+    self.create_encoder(param,start)
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 117, in create_encoder
+    self.__circuits[self.__circ]['func'](params,start)
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 171, in c11ansatz
+    self.c11(param[parperlay*l:parperlay*(l+1)],self.__n_qubit_auto,start) 
+             ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/array.py", line 370, in __getitem__
+    return lax_numpy._rewriting_take(self, idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/numpy/lax_numpy.py", line 11411, in _rewriting_take
+    return _gather(arr, treedef, static_idx, dynamic_idx, indices_are_sorted,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/numpy/lax_numpy.py", line 11420, in _gather
+    indexer = _index_to_gather(shape(arr), idx)  # shared with _scatter_update
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/numpy/lax_numpy.py", line 11528, in _index_to_gather
+    idx = _canonicalize_tuple_index(len(x_shape), idx)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/numpy/lax_numpy.py", line 11852, in _canonicalize_tuple_index
+    raise IndexError(
+IndexError: Too many indices: 0-dimensional array indexed with 1 regular index.
+srun: error: eu-g9-045-3: task 0: Exited with exit code 1
+srun: Job 17971928 step creation temporarily disabled, retrying (Requested nodes are busy)
+srun: Step created for StepId=17971928.1
+Traceback (most recent call last):
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 171, in <module>
+    main()
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 96, in main
+    _=ae.train(X,opt,param.epochs,param.batch_size,val_split=param.val_percentage)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 217, in train
+    weights, loss_value = train_step(weights, X_batch)
+                          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 206, in train_step
+    loss, weights = opt.step_and_cost(loss_function,weights)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/optimize/gradient_descent.py", line 64, in step_and_cost
+    g, forward = self.compute_grad(objective_fn, args, kwargs, grad_fn=grad_fn)
+                 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/optimize/gradient_descent.py", line 122, in compute_grad
+    grad = g(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/_grad.py", line 221, in __call__
+    self._forward = self._fun(*args, **kwargs)
+                    ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 296, in _cost_fn_EM
+    output_dms = jnp.array([trainer(w,x) for x in X])
+                           ^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/EMCost.py", line 296, in <listcomp>
+    output_dms = jnp.array([trainer(w,x) for x in X])
+                            ^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 199, in trainer
+    return  self.exec_circ(param,dm)
+            ^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 113, in exec_circ
+    return _dec(param,_sp_enc(param,dm,start),start)
+                      ^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 987, in __call__
+    return self._impl_call(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 963, in _impl_call
+    self.construct(args, kwargs)
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/logging/decorators.py", line 61, in wrapper_entry
+    return func(*args, **kwargs)
+           ^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/pennylane/workflow/qnode.py", line 857, in construct
+    self._qfunc_output = self.func(*args, **kwargs)
+                         ^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 102, in _sp_enc
+    self.create_encoder(param,start)
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 117, in create_encoder
+    self.__circuits[self.__circ]['func'](params,start)
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 171, in c11ansatz
+    self.c11(param[parperlay*l:parperlay*(l+1)],self.__n_qubit_auto,start) 
+             ~~~~~^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/array.py", line 370, in __getitem__
+    return lax_numpy._rewriting_take(self, idx)
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/numpy/lax_numpy.py", line 11411, in _rewriting_take
+    return _gather(arr, treedef, static_idx, dynamic_idx, indices_are_sorted,
+           ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/numpy/lax_numpy.py", line 11420, in _gather
+    indexer = _index_to_gather(shape(arr), idx)  # shared with _scatter_update
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/numpy/lax_numpy.py", line 11528, in _index_to_gather
+    idx = _canonicalize_tuple_index(len(x_shape), idx)
+          ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/.local/lib/python3.11/site-packages/jax/_src/numpy/lax_numpy.py", line 11852, in _canonicalize_tuple_index
+    raise IndexError(
+IndexError: Too many indices: 0-dimensional array indexed with 1 regular index.
+srun: error: eu-g9-045-3: task 0: Exited with exit code 1
