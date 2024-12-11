@@ -106,25 +106,25 @@ def main():
 
     min_val_found= min(val_loss)
 
-    if param.image_output:
-        plt.figure()
-        custom_palette =[
-        # '#C24AA2','#D6518F',
-        '#EC5A77','#F57C73','#F69C6D','#F6BC66']
-        sns.set_palette(custom_palette)  
+    # if param.image_output:
+    #     plt.figure()
+    #     custom_palette =[
+    #     # '#C24AA2','#D6518F',
+    #     '#EC5A77','#F57C73','#F69C6D','#F6BC66']
+    #     sns.set_palette(custom_palette)  
 
-        sns.lineplot(x=range(len(train_loss)), y=train_loss, label='train loss', color='#009E81')
-        sns.lineplot(x=range(len(val_loss)), y=val_loss, label='validation loss' ,color='#007162',linestyle=':')
-        plt.legend(title='Batch size')
+    #     sns.lineplot(x=range(len(train_loss)), y=train_loss, label='train loss', color='#009E81')
+    #     sns.lineplot(x=range(len(val_loss)), y=val_loss, label='validation loss' ,color='#007162',linestyle=':')
+    #     plt.legend(title='Batch size')
 
-        plt.ylim((0,1))
+    #     plt.ylim((0,1))
 
-        plt.xlabel('epochs')
-        plt.ylabel('loss')
-        plt.title(f'Loss on AE {param.n_input_qubit}->{param.n_input_qubit-param.n_trash_qubit}, Batch size = {param.batch_size}')
+    #     plt.xlabel('epochs')
+    #     plt.ylabel('loss')
+    #     plt.title(f'Loss on AE {param.n_input_qubit}->{param.n_input_qubit-param.n_trash_qubit}, Batch size = {param.batch_size}')
         
-        plt.savefig(batch_folder+f'/graph{param.n_input_qubit}_{param.n_input_qubit-param.n_trash_qubit}__{i}')
-        # Info file 
+    #     plt.savefig(batch_folder+f'/graph{param.n_input_qubit}_{param.n_input_qubit-param.n_trash_qubit}__{i}')
+    #     # Info file 
     with open(batch_folder+f'/info_{i}.txt','a') as file:
         file.write(f'RUN INFORMATION\n'\
                     f'Input qubits={param.n_input_qubit}\n'\
@@ -136,7 +136,8 @@ def main():
                     f'Loss name={ae.get_loss_name()}\n'\
                     f'Val_percentage={param.val_percentage}\n'\
                     f'Min val loss found={min_val_found}\n'\
-                    f'Exec (training) time={timek}')
+                    f'Exec (training) time={timek}\n'\
+                    f'Output files= {loss_train_file_name}, {loss_val_file_name}, {weights_file_name}')
 
 
 
