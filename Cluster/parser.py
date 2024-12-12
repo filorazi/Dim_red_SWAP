@@ -25,6 +25,7 @@ def parse():
     parser.add_argument('-ls','--list-op-support', required=False, type=int, default=[1],
                         nargs='*', dest='list_op_support',
                         help='operator ranges considered in the earth mover distance')
+    parser.add_argument('-id','--jobid',dest='jobid' , default=0)
 
     parser.add_argument('-lp','--list-op-support-probs', required=False, type=float, default=[1],
                         nargs='*', dest='list_op_support_probs',

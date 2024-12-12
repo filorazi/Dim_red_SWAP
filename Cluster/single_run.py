@@ -71,14 +71,7 @@ def main():
     os.makedirs(batch_folder,exist_ok=True)
 
     # don't overwrite if a file with the same name already exists
-    i = 0
-    while os.path.exists(batch_folder+f'/loss_train{i}.npy'):
-        i += 1
-
-    loss_train_file_name=batch_folder+f'/loss_train{i}'
-    loss_val_file_name=batch_folder+f'/loss_val{i}'
-    weights_file_name=batch_folder+f'/weights{i}'
-    print(f"Running AE with {param.n_input_qubit} input qubit and {param.n_trash_qubit} trash qubit in batches of {param.batch_size}")
+    # print(f"Running AE with {param.n_input_qubit} input qubit and {param.n_trash_qubit} trash qubit in batches of {param.batch_size}")
     if param.jax:
         ae = JAxutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
         opt = optax.adam(param.step_size)
@@ -100,6 +93,14 @@ def main():
     timek=end_time-start_time
     batch_epochs=ae.get_final_epoch()
     weights=ae.best_params()
+    i = 0
+    while os.path.exists(batch_folder+f'/loss_train{i}.npy'):
+        i += 1
+
+    loss_train_file_name=batch_folder+f'/loss_train{i}'
+    loss_val_file_name=batch_folder+f'/loss_val{i}'
+    weights_file_name=batch_folder+f'/weights{i}'
+
     np.save(loss_train_file_name,np.array(train_loss))            
     np.save(loss_val_file_name,np.array(val_loss))            
     np.save(weights_file_name,np.array(weights))
