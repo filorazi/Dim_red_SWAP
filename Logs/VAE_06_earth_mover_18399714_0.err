@@ -1,0 +1,23 @@
+Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
+Traceback (most recent call last):
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 172, in <module>
+    main()
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 88, in main
+    _=ae.train(X,opt,param.epochs,param.batch_size,val_split=param.val_percentage)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 236, in train
+    if val_loss[-1]<min_val_loss_in_train-min_delta:
+                    ^^^^^^^^^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'min_val_loss_in_train' where it is not associated with a value
+srun: error: eu-g9-028-1: task 0: Exited with exit code 1
+Traceback (most recent call last):
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 172, in <module>
+    main()
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/single_run.py", line 88, in main
+    _=ae.train(X,opt,param.epochs,param.batch_size,val_split=param.val_percentage)
+      ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/cluster/home/forazi/Dim_red_SWAP/Cluster/autoencoder7.py", line 236, in train
+    if val_loss[-1]<min_val_loss_in_train-min_delta:
+                    ^^^^^^^^^^^^^^^^^^^^^
+UnboundLocalError: cannot access local variable 'min_val_loss_in_train' where it is not associated with a value
+srun: error: eu-g9-028-1: task 0: Exited with exit code 1
