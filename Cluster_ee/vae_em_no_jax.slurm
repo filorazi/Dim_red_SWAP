@@ -1,13 +1,13 @@
 #!/bin/bash -l
 
-#SBATCH --nodes=1
+#SBATCH --nodes=5
 #SBATCH --ntasks-per-node=1
 # #SBATCH --begin=2021-07-10T02:00:00 # Defer start to this much time
 #SBATCH --time=7-00:00:00 # Runtime in D-HH:MM:SS
 #SBATCH --mem-per-cpu=32000 # Memory pool for all cores (see also --mem-per-cpu)
-#SBATCH --array=0-5
-#SBATCH -o ./Logs/VAE_06_earth_mover_%A_%a.out # File to which STDOUT will be written
-#SBATCH -e ./Logs/VAE_06_earth_mover_%A_%a.err # File to which STDERR will be written
+#SBATCH --array=0-21
+#SBATCH -o ./Logs/ee/VAE_06_earth_mover_%A_%a.out # File to which STDOUT will be written
+#SBATCH -e ./Logs/ee/VAE_06_earth_mover_%A_%a.err # File to which STDERR will be written
 #SBATCH --mail-type=FAIL # Type of email notification- BEGIN,END,FAIL,ALL
 #SBATCH --mail-user=filippo.orazi2@unibo.it # Email to which notifications will be sent
 
@@ -25,9 +25,9 @@ export JID=$SLURM_JOB_ID
 
 REPETITIONS=8
 NUMINPUTQUBITS=8
-NUMMIDDLEQUBITS=(1 2 3 )
+NUMMIDDLEQUBITS=(1 2 3 4 5 6 7)
 NUMMIDDLEQUBIT=${NUMMIDDLEQUBITS[$(( ${TASK_ID} % 3))]}
-BATCHSIZES=(10 20 25 50 100)
+BATCHSIZES=(8 25 100)
 BATCHSIZE=${BATCHSIZES[$(( ${TASK_ID} % 5 ))]}
 EPOCHS=300
 FRACSAMPLEDSTATES=0.25
@@ -53,9 +53,9 @@ echo LISTOPSUPPORTMAXRANGE=$LISTOPSUPPORTMAXRANGE
 echo RUNID=$RUNID
 echo 'NO JAX' 
 
-echo "srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE} -njx"
+echo "srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs/ee' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE} -njx"
 
-srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE} -njx
+srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs/ee' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE} -njx
 for (( i=2; i<=(( $NUMRESTARTS - 1)); i++ ))
 do
    echo ""
@@ -64,9 +64,9 @@ do
    echo "-------------------------"
    echo "Running restart no. $i"
    echo "-------------------------"
-   srun -N 1 -n 1 python Cluster_ee/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE} -njx
+   srun -N 1 -n 1 python Cluster_ee/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs/ee' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE} -njx
 done 
-srun -N 1 -n 1 python Cluster_ee/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE} -njx
+srun -N 1 -n 1 python Cluster_ee/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs/ee' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE} -njx
 
 echo "job finished"
 wait

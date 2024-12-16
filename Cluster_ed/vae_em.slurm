@@ -1,13 +1,13 @@
 #!/bin/bash -l
 
-#SBATCH --nodes=1
+#SBATCH --nodes=5
 #SBATCH --ntasks-per-node=1
 # #SBATCH --begin=2021-07-10T02:00:00 # Defer start to this much time
 #SBATCH --time=7-00:00:00 # Runtime in D-HH:MM:SS
 #SBATCH --mem-per-cpu=32000 # Memory pool for all cores (see also --mem-per-cpu)
-#SBATCH --array=0-1
-#SBATCH -o ./Logs/VAE_06_earth_mover_%A_%a.out # File to which STDOUT will be written
-#SBATCH -e ./Logs/VAE_06_earth_mover_%A_%a.err # File to which STDERR will be written
+#SBATCH --array=0-21
+#SBATCH -o ./Logs/ed/VAE_06_earth_mover_%A_%a.out # File to which STDOUT will be written
+#SBATCH -e ./Logs/ed/VAE_06_earth_mover_%A_%a.err # File to which STDERR will be written
 #SBATCH --mail-type=FAIL # Type of email notification- BEGIN,END,FAIL,ALL
 #SBATCH --mail-user=filippo.orazi2@unibo.it # Email to which notifications will be sent
 
@@ -52,9 +52,9 @@ echo LISTOPSUPPORTPROBS=$LISTOPSUPPORTPROBS
 echo LISTOPSUPPORTMAXRANGE=$LISTOPSUPPORTMAXRANGE
 echo RUNID=$RUNID
 
-echo "srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE}"
+echo "srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs/ed' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE}"
 
-srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE}
+srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs/ed' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE}
 for (( i=2; i<=(( $NUMRESTARTS - 1)); i++ ))
 do
    echo ""
@@ -63,9 +63,9 @@ do
    echo "-------------------------"
    echo "Running restart no. $i"
    echo "-------------------------"
-   srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE}
+   srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs/ed' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE}
 done 
-srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE}
+srun -N 1 -n 1 python Cluster/single_run.py -ni ${NUMINPUTQUBITS} -nt ${NUMMIDDLEQUBIT} -b ${BATCHSIZE} -e ${EPOCHS} -v ${VALSPLIT} -sz ${OPTSTEP} -of 'runs/ed' -ls ${LISTOPSUPPORT}  -lp ${LISTOPSUPPORTPROBS}  -lr ${LISTOPSUPPORTMAXRANGE}
 
 echo "job finished"
 wait
