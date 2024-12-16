@@ -90,8 +90,6 @@ class Axutoencoder():
         self.__sp(dm,0)
         qml.Barrier()
         self.create_encoder(param,start)
-        qml.Barrier()
-        self.create_decoder(param,start)
 
 
     def exec_circ(self,param,dm,start=0):
@@ -100,7 +98,7 @@ class Axutoencoder():
             self.__sp(dm,0)
             qml.Barrier()
             self.create_encoder(param,start)
-            return qml.density_matrix(list(range(self.__n_qubit_trash,self.__n_qubit_auto)))
+            return qml.density_matrix(list(range(0,self.__n_qubit_trash)))
         return _sp_enc(param,dm,start)
 
 
@@ -191,6 +189,8 @@ class Axutoencoder():
 
         
         def train_step(weights,data):
+            print(type(weights))
+
             loss_function = self.__loss(data,trainer,create_dm([[1]+[0]*(2**self.__n_qubit_trash-1)]*len(data)))
             # print(loss_function(weights))
             
