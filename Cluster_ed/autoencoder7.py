@@ -181,6 +181,7 @@ class Axutoencoder():
 
     def train(self, X , opt,epochs,batch_size=None,warm_weights=None, val_split=0.0,min_delta=0.005,patience=30):
         train_loss = []   
+        min_val_loss_in_train=100
         val_loss = [0]
         final_epoch=-1
 
