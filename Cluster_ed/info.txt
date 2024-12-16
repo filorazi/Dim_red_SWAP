@@ -1,0 +1,1 @@
+This folder contains the file need to train autoencoder6 (encoder decoder architecture with Jax) and autoencoder7 (encoder decoder architecture without Jax)
