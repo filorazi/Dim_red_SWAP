@@ -179,7 +179,7 @@ class Axutoencoder():
         fig, ax = qml.draw_mpl(trainer)(self.__wq[-1],.5)
         plt.show()
 
-    def train(self, X , opt,epochs,batch_size=None,warm_weights=None, val_split=0.0):
+    def train(self, X , opt,epochs,batch_size=None,warm_weights=None, val_split=0.0,min_delta=0.005,patience=30):
         train_loss = []   
         val_loss = [0]
         final_epoch=-1
@@ -224,14 +224,25 @@ class Axutoencoder():
             else:
                 val_loss.append(1000)
             train_loss.append(np.average(batch_loss,weights=[len(X_batch) for X_batch in [X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]]))
-            if epoch > 5 and np.mean(val_loss[-3:])<0.001:
-                print(f'\nEarly stop at epoch {epoch} for perfect training')
-                final_epoch = epoch
-                break
-            if epoch > 15 and np.std(val_loss[-15:])<0.001:
-                print(f'\nEarly stop at epoch {epoch} for plateau')
-                final_epoch = epoch
-                break
+            if epoch > 15:
+                if np.mean(val_loss[-3:])<0.001:
+                    print(f'\nEarly stop at epoch {epoch} for perfect training')
+                    final_epoch = epoch
+                    break
+                if np.std(val_loss[-15:])<0.001:
+                    print(f'\nEarly stop at epoch {epoch} for plateau')
+                    final_epoch = epoch
+                    break
+                if val_loss[-1]<min_val_loss_in_train-min_delta:
+                    wait=0
+                    min_val_loss_in_train =val_loss[-1]
+                else:
+                    wait-=-1
+                if wait > patience:
+                    print(f'Early stop at epoch {epoch} for not improving in the last {wait} epochs')
+                    final_epoch = epoch
+                    break
+
         if final_epoch ==-1:
             final_epoch=epochs
         try:

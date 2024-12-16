@@ -1,3 +1,0 @@
-Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
-slurmstepd: error: *** STEP 17081252.0 ON eu-g9-045-2 CANCELLED AT 2024-12-02T14:11:55 ***
-slurmstepd: error: *** JOB 17081252 ON eu-g9-045-2 CANCELLED AT 2024-12-02T14:11:55 ***

@@ -1,5 +1,0 @@
-Many modules are hidden in this stack. Use "module --show_hidden spider SOFTWARE" if you are not able to find the required software
-slurmstepd: error: Detected 1 oom_kill event in StepId=17080021.0. Some of the step tasks have been OOM Killed.
-srun: error: eu-g9-022-4: task 0: Out Of Memory
-slurmstepd: error: Detected 1 oom_kill event in StepId=17080021.1. Some of the step tasks have been OOM Killed.
-srun: error: eu-g9-022-4: task 0: Out Of Memory
