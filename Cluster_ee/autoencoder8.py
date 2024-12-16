@@ -183,29 +183,30 @@ class Axutoencoder():
             self.__wq[-1]=warm_weights
         if type(epochs) is not int:
             raise ValueError(f'Epochs should be a integer not a {type(epochs)}')
+        opt_state = opt.init(self.__wq[-1])
 
         def trainer(param,dm):
             return  self.exec_circ(param,dm)
 
         
-        def train_step(weights,data):
-            print(type(weights))
-
+        def train_step(weights,opt_state,data):
             loss_function = self.__loss(data,trainer,create_dm([[1]+[0]*(2**self.__n_qubit_trash-1)]*len(data)))
             # print(loss_function(weights))
             
-            weights,loss  = opt.step_and_cost(loss_function,weights)
+            loss, grads = jax.value_and_grad(loss_function)(weights)
             # print(f'loss:\n{loss}')
 
             # print(f'grads:\n{grads}')
-            return weights, loss
+            updates, opt_state = opt.update(grads, opt_state)
+            weights = optax.apply_updates(weights, updates)
+            return weights, opt_state, loss
 
 
         for epoch in range(epochs):
             batch_loss=[]
             weights=jnp.array(self.__wq[-1])
             for i, X_batch in enumerate([X_train[i:i + batch_size] for i in range(0, len(X_train), batch_size)]):
-                weights, loss_value = train_step(weights, X_batch)
+                weights, opt_state, loss_value = train_step(weights, opt_state, X_batch)
                 batch_loss.append(loss_value)
                 print(f'\rEpoch {epoch+1}, \tBatch:{i}, \tTrain Loss = {np.mean(batch_loss):.6f}, \tVal Loss = {val_loss[-1]:.6f}',end='')
             self.__wq.append(weights)

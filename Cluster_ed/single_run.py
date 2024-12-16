@@ -79,6 +79,7 @@ def main():
     else:
         ae = Axutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
         opt=AdamOptimizer(stepsize=param.step_size)
+        opt = optax.adam(param.step_size)
 
 
     ae.set_layers(3)
@@ -126,6 +127,7 @@ def main():
         
     #     plt.savefig(batch_folder+f'/graph{param.n_input_qubit}_{param.n_input_qubit-param.n_trash_qubit}__{i}')
     #     # Info file 
+    # ae.plot_weights()
     with open(batch_folder+f'/info_{i}.txt','a') as file:
         file.write(f'RUN INFORMATION\n'\
                     f'Input qubits={param.n_input_qubit}\n'\

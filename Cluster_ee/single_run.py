@@ -45,12 +45,10 @@ def main():
     # X=[get_input_state(x) for x in X]
     X=[data['ground_states'][x] for x in X]
     
-    param.jax=False
 
     n_qubit=param.n_input_qubit
     dvc = qml.device('default.mixed', wires=n_qubit, shots=None)
  
-    print(param.val_percentage)
     set_global( param.n_trash_qubit,
             param.n_trash_qubit,
             param.n_trash_qubit,
@@ -76,7 +74,7 @@ def main():
 
     else:
         ae = Axutoencoder(param.n_input_qubit,param.n_trash_qubit,dvc,'c11')
-        opt=AdamOptimizer(stepsize=param.step_size)
+        opt = optax.adam(param.step_size)
 
 
     ae.set_layers(3)
@@ -125,7 +123,7 @@ def main():
     #     plt.savefig(batch_folder+f'/graph{param.n_input_qubit}_{param.n_input_qubit-param.n_trash_qubit}__{i}')
     #     # Info file 
 
-    ae.plot_weights()
+    # ae.plot_weights()
     plt.show()
     with open(batch_folder+f'/info_{i}.txt','a') as file:
         file.write(f'RUN INFORMATION\n'\
