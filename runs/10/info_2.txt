@@ -9,4 +9,15 @@ Loss name=EMdistance
 Val_percentage=0.2
 Min val loss found=0.027776387440402846
 Exec (training) time=42393.27809381485
+Output files= runs/10/loss_train2, runs/10/loss_val2, runs/10/weights2RUN INFORMATION
+Input qubits=8
+Trash qubit=1
+Seed=42
+Optimizer=Optax.adam(stepsize=0.2)
+Epochs=300
+Batch sizes=10
+Loss name=EMdistance
+Val_percentage=0.2
+Min val loss found=0.013861850709262638
+Exec (training) time=207010.52379179
 Output files= runs/10/loss_train2, runs/10/loss_val2, runs/10/weights2
