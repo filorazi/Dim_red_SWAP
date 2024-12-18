@@ -1,0 +1,18 @@
+Job runs on node:
+eu-g9-048-4
+REPETITIONS=8
+COSTTYPE=earth-mover
+NUMINPUTQUBITS=8
+NUMMIDDLEQUBIT=3
+EPOCHS=300
+OPTSTEP=0.2
+BATCHSIZE=
+VALSPLIT=0.2
+FRACSAMPLEDSTATES=0.25
+LISTOPSUPPORT=1 2 3
+LISTOPSUPPORTPROBS=1. 1. 1.
+LISTOPSUPPORTMAXRANGE=1 5 3
+RUNID=1
+NO JAX
+srun -N 1 -n 1 python Cluster/single_run.py -ni 8 -nt 3 -b  -e 300 -v 0.2 -sz 0.2 -of 'runs/ee' -ls 1 2 3  -lp 1. 1. 1.  -lr 1 5 3 -njx
+job finished

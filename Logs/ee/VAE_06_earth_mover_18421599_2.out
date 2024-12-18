@@ -1,0 +1,18 @@
+Job runs on node:
+eu-g9-045-3
+REPETITIONS=8
+COSTTYPE=earth-mover
+NUMINPUTQUBITS=8
+NUMMIDDLEQUBIT=3
+EPOCHS=300
+OPTSTEP=0.2
+BATCHSIZE=100
+VALSPLIT=0.2
+FRACSAMPLEDSTATES=0.25
+LISTOPSUPPORT=1 2 3
+LISTOPSUPPORTPROBS=1. 1. 1.
+LISTOPSUPPORTMAXRANGE=1 5 3
+RUNID=0
+NO JAX
+srun -N 1 -n 1 python Cluster/single_run.py -ni 8 -nt 3 -b 100 -e 300 -v 0.2 -sz 0.2 -of 'runs/ee' -ls 1 2 3  -lp 1. 1. 1.  -lr 1 5 3 -njx
+Epoch 1, 	Batch:0, 	Train Loss = 2.140436, 	Val Loss = 0.000000Epoch 2, 	Batch:0, 	Train Loss = 1.863304, 	Val Loss = 2.007902Epoch 3, 	Batch:0, 	Train Loss = 1.733707, 	Val Loss = 1.863788Epoch 4, 	Batch:0, 	Train Loss = 1.699520, 	Val Loss = 1.686516Epoch 5, 	Batch:0, 	Train Loss = 1.204294, 	Val Loss = 1.049764Epoch 6, 	Batch:0, 	Train Loss = 0.988160, 	Val Loss = 0.981333Epoch 7, 	Batch:0, 	Train Loss = 0.855104, 	Val Loss = 0.849650Epoch 8, 	Batch:0, 	Train Loss = 0.778642, 	Val Loss = 0.784309Epoch 9, 	Batch:0, 	Train Loss = 0.924838, 	Val Loss = 0.916683Epoch 10, 	Batch:0, 	Train Loss = 0.920110, 	Val Loss = 0.914687Epoch 11, 	Batch:0, 	Train Loss = 0.887052, 	Val Loss = 0.843824Epoch 12, 	Batch:0, 	Train Loss = 0.774033, 	Val Loss = 0.788825Epoch 13, 	Batch:0, 	Train Loss = 0.697513, 	Val Loss = 0.736188Epoch 14, 	Batch:0, 	Train Loss = 0.778645, 	Val Loss = 0.749925Epoch 15, 	Batch:0, 	Train Loss = 0.778081, 	Val Loss = 0.784738Epoch 16, 	Batch:0, 	Train Loss = 0.758638, 	Val Loss = 0.768469Epoch 17, 	Batch:0, 	Train Loss = 0.697410, 	Val Loss = 0.756862job finished

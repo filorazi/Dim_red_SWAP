@@ -1,0 +1,12 @@
+RUN INFORMATION
+Input qubits=8
+Trash qubit=2
+Seed=42
+Optimizer=Optax.adam(stepsize=0.2)
+Epochs=84
+Batch sizes=25
+Loss name=EMdistance
+Val_percentage=0.2
+Min val loss found=0.15188874877213454
+Exec (training) time=26536.183414936066
+Output files= runs/ed/25/loss_train3, runs/ed/25/loss_val3, runs/ed/25/weights3
