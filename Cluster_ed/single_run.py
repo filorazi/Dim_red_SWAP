@@ -95,12 +95,12 @@ def main():
     batch_epochs=ae.get_final_epoch()
     weights=ae.best_params()
     i = 0
-    while os.path.exists(batch_folder+f'/loss_train{i}.npy'):
+    while os.path.exists(batch_folder+f'/loss_train_(8)({8-param.n_trash_qubit})_{i}.npy'):
         i += 1
 
-    loss_train_file_name=batch_folder+f'/loss_train{i}'
-    loss_val_file_name=batch_folder+f'/loss_val{i}'
-    weights_file_name=batch_folder+f'/weights{i}'
+    loss_train_file_name=batch_folder+f'/loss_train_(8)({8-param.n_trash_qubit})_{i}'
+    loss_val_file_name=batch_folder+f'/loss_val_(8)({8-param.n_trash_qubit})_{i}'
+    weights_file_name=batch_folder+f'/weights_(8)({8-param.n_trash_qubit})_{i}'
 
     np.save(loss_train_file_name,np.array(train_loss))            
     np.save(loss_val_file_name,np.array(val_loss))            
@@ -128,22 +128,23 @@ def main():
     #     plt.savefig(batch_folder+f'/graph{param.n_input_qubit}_{param.n_input_qubit-param.n_trash_qubit}__{i}')
     #     # Info file 
     # ae.plot_weights()
-    with open(batch_folder+f'/info_{i}.txt','a') as file:
+    with open(batch_folder+f'/info__(8)({8-param.n_trash_qubit})_{i}.txt','a') as file:
         file.write(f'RUN INFORMATION\n'\
-                    f'Input qubits={param.n_input_qubit}\n'\
-                    f'Trash qubit={param.n_trash_qubit}\n'\
-                    f'Seed={param.seed}\n'\
-                    f'Optimizer=Optax.adam(stepsize={param.step_size})\n'\
-                    f'Epochs={batch_epochs}\n'\
-                    f'Batch sizes={param.batch_size}\n'\
-                    f'Loss name={ae.get_loss_name()}\n'\
-                    f'Val_percentage={param.val_percentage}\n'\
-                    f'Min val loss found={min_val_found}\n'\
-                    f'Exec (training) time={timek}\n'\
-                    f'Output files= {loss_train_file_name}, {loss_val_file_name}, {weights_file_name}')
-
-
-
+                    f'Input qubits = {param.n_input_qubit}\n'\
+                    f'Trash qubit = {param.n_trash_qubit}\n'\
+                    f'Seed = {param.seed}\n'\
+                    f'Optimizer = Optax.adam(stepsize={param.step_size})\n'\
+                    f'Epochs = {batch_epochs}\n'\
+                    f'Batch sizes = {param.batch_size}\n'\
+                    f'Loss name = {ae.get_loss_name()}\n'\
+                    f'Val_percentage = {param.val_percentage}\n'\
+                    f'Min val loss found = {min_val_found}\n'\
+                    f'Exec (training) time = {timek}\n'\
+                    f'Support list ={param.list_op_support[:param.n_trash_qubit]}\n'\
+                    f'Support list probs={param.list_op_support_probs[:param.n_trash_qubit]}\n'\
+                    f'Support list max range = {param.list_op_support_max_range[:param.n_trash_qubit]}\n'\
+                    f'Jax = {param.jax}\n'\
+                    f'Output files = {loss_train_file_name}, {loss_val_file_name}, {weights_file_name}')
 
 
 

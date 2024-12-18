@@ -172,7 +172,7 @@ class Axutoencoder():
         train_loss = []   
         val_loss = [0]
         final_epoch=-1
-
+        min_val_loss_in_train = 1000
         X_train = X[0:int(np.floor(len(X)*(1-val_split)))]
         X_val = X[int(np.floor(len(X)*(1-val_split))):]
         if batch_size is None:
