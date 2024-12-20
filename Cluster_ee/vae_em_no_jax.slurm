@@ -5,7 +5,7 @@
 # #SBATCH --begin=2021-07-10T02:00:00 # Defer start to this much time
 #SBATCH --time=7-00:00:00 # Runtime in D-HH:MM:SS
 #SBATCH --mem-per-cpu=32000 # Memory pool for all cores (see also --mem-per-cpu)
-#SBATCH --array=0-21
+#SBATCH --array=0-7
 #SBATCH -o ./Logs/ee/VAE_06_earth_mover_%A_%a.out # File to which STDOUT will be written
 #SBATCH -e ./Logs/ee/VAE_06_earth_mover_%A_%a.err # File to which STDERR will be written
 #SBATCH --mail-type=FAIL # Type of email notification- BEGIN,END,FAIL,ALL
@@ -27,9 +27,9 @@ REPETITIONS=8
 NUMINPUTQUBITS=8
 NUMMIDDLEQUBITS=(1 2 3 4 5 6 7)
 NUMMIDDLEQUBIT=${NUMMIDDLEQUBITS[$(( ${TASK_ID} % 7))]}
-BATCHSIZES=(8 25 100)
-BATCHSIZE=${BATCHSIZES[$(( ${TASK_ID} % 3 ))]}
-EPOCHS=300
+BATCHSIZES=(100)
+BATCHSIZE=${BATCHSIZES[$(( ${TASK_ID} % 1 ))]}
+EPOCHS=2500
 FRACSAMPLEDSTATES=0.25
 LISTOPSUPPORT="1 2 3"
 LISTOPSUPPORTPROBS="1. 1. 1."

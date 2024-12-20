@@ -168,7 +168,7 @@ class Axutoencoder():
         fig, ax = qml.draw_mpl(trainer)(self.__wq[-1],.5)
         plt.show()
 
-    def train(self, X , opt,epochs,batch_size=None,warm_weights=None, val_split=0.0,min_delta=0.005,patience=30):
+    def train(self, X , opt,epochs,batch_size=None,warm_weights=None, val_split=0.0,min_delta=0.005,patience=1000):
         train_loss = []   
         val_loss = [0]
         final_epoch=-1
