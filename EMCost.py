@@ -132,7 +132,7 @@ def expval_Pauli_strings(states_in_list,
     ops = operators_from_Pauli_strings(Pauli_string_list)
     state_op_expval = []
     if in_mid_out_Q=='input':
-        for state in states_in_list:
+        for state in states_in_list:        
             state_op_expval += [expval_operators_input(state, ops)]
     # elif in_mid_out_Q=='middle':
     #     for state in states_in_list:
@@ -383,6 +383,151 @@ def cost_fn_EM(X,trainer,input_states):
         
         #FO this input state should be simply self.__sp(x,0)
 
+        expval_input_list_list = expval_Pauli_strings(input_states,
+                                                    Pauli_string_lists,
+                                                    in_mid_out_Q='input')
+
+        expval_output_list_list = expval_Pauli_strings(output_dms,
+                                                    Pauli_string_lists,
+                                                    in_mid_out_Q='output')
+        
+        # The earth mover distance part of the cost function for each pair of input and output states is
+        # max_{w} sum_op w_op * c_op, where c_op = Tr(op @ (out_dm - in_dm))
+        # with the condition P_mx @ |w| <= 1
+        # The condition defines a len(Pauli_string_lists) dimensional simplicial complex which is independent
+        # of the parameters of the network, and it only depends on the choice of the correlators.
+        # Within this simplex, we need to maximize the overlap between the vector c and w which
+        # correspond to the operator expectation values and the weight coefficients, respectively.
+        # This will be maximized by w values that are in the corner of this simplicial complex
+        # closest to c.
+        # For generic values of the network parameters and thus for generic values of c, small perturbations
+        # in c will not change which w maximizes the overlap. Therefore, the derivative of c will
+        # not depend on the linear constraints. We can simply take the resulting w as a constant
+        # and take the derivative w.r.t. c only.
+        #
+        # Note, however, that the corner of the simplex maximizing c.T @ w can change during the
+        # gradient descent learning procedure. This can lead to wiggles in the cost function during
+        # minimization.
+        w = cvxpy.Variable(len(Pauli_string_lists_indices))
+
+        for i_state in range(n_states):
+            # expval_output_list_list is of qml.ArrayBox type, hence it needs to be transformed to regular numpy arrays
+            expval_diff = qml.math.toarray(expval_output_list_list[i_state]) - jnp.array(expval_input_list_list[i_state])
+            lin_prog_problem = cvxpy.Problem(cvxpy.Maximize(expval_diff.T @ w), [P_mx @ cvxpy.abs(w) <= 1.])
+            lin_prog_problem.solve()
+            
+            # Note that we cannot use the numpy vector expval_diff in the cost function
+            # Instead, we need to use the pennylane.numpy or jax.numpy vectors that allow us to differentiate
+            # the cost finction. The solution of the optimization, however, is a simple constant vector
+            # that we don't take the gradient of w.r.t. the VAE parameters
+            cost += (expval_output_list_list[i_state] - expval_input_list_list[i_state]).T @ w.value
+
+        cost /= n_states
+
+        return cost
+
+    return _cost_fn_EM
+
+
+
+
+def cost__EM(input_states):
+    def _cost_fn_EM(output_dms):
+        cost = 0.
+        X=input_states
+        n_states = len(X)
+        # return the density matrix of the autoencoder
+        # return the density matrix of the autoencoder
+        # output_dms =jnp.array([reduce_dm(trainer(w,x),range(system_params['trash_qubits'], system_params['num_input_qubits']+system_params['trash_qubits']),check_state=True) for x in X])
+        # for input_state in input_states:
+        #     middle_dm, _, expval_Z_traced_qubits = vae_compress(
+        #                                             compress_convolution_parameters=compressing_convolutional_params,
+        #                                             compress_pooling_parameters=compres
+        # sing_pooling_params,
+        #                                             state_vector_in=input_state,
+        #                                             measure_traced_qubits_Q=(abs(system_params['coeff_traced_cost'])>0),
+        #                                             use_SVD_unitary_Q=use_SVD_unitary_Q)
+
+        #     if system_params['use_jax_Q']:
+        #         cost += system_params['coeff_traced_cost'] * jnp.sum(jnp.array([(z-1)**2 for z in expval_Z_traced_qubits])) / len(system_params['traced_qubits'])
+        #     else:
+        #         cost += system_params['coeff_traced_cost'] * np.sum(np.array([(z-1)**2 for z in expval_Z_traced_qubits])) / len(system_params['traced_qubits'])
+
+        #     if system_params['same_compress_expand_Q']:
+        #         output_dm = vae_expand(compressing_convolutional_params,
+        #                                compressing_pooling_params,
+        #                                middle_dm,
+        #                                decomposed_Q=False,
+        #                                use_SVD_unitary_Q=use_SVD_unitary_Q)
+        #     else:
+        #         output_dm = vae_expand(expanding_convolutional_params,
+        #                                expanding_pooling_params,
+        #                                middle_dm,
+        #                                decomposed_Q=False,
+        #                                use_SVD_unitary_Q=use_SVD_unitary_Q)
+
+        #     if system_params['use_jax_Q']:
+        #         assert jnp.abs(jnp.trace(output_dm) - 1.) < 1e-6
+        #         output_dm /= jnp.trace(output_dm)
+        #     else:
+        #         assert np.abs(np.trace(output_dm) - 1.) < 1e-6
+        #         output_dm /= np.trace(output_dm)
+        #     output_dms += [output_dm]
+
+        # Generate operators defined by earth_mover_cost_operator_support
+        # and earth_mover_cost_operator_support_probs
+        # This is re-generated every time since the operators are sampled if
+        # support_prob_list is not identically 1., and the operators get
+        # shifted around if translation_invariance_Q is True
+        Pauli_string_lists = get_Pauli_strings(n_system_sites=system_params['num_input_qubits'],
+                                                operator_support_list=system_params['operator_support'],
+                                                support_prob_list=system_params['operator_support_probs'],
+                                                translation_invariance_Q=system_params['operator_translation_invariance_Q'],
+                                                max_rng=system_params['operator_support_max_range'],
+                                                random_shift_sites_Q=True)
+
+        
+        # Flatten the top level of Pauli_strings_lists
+        # Example:
+        # Pauli_string_lists = [[(0, 'x')],
+        #                       [(0, 'y')],
+        #                       [(0, 'z')],
+        #                       [(2, 'x'), (3, 'x')],
+        #                       [(2, 'x'), (3, 'y')],
+        #                       [(2, 'x'), (3, 'z')],
+        #                       [(2, 'y'), (3, 'x')],
+        #                       [(2, 'y'), (3, 'y')],
+        #                       [(2, 'y'), (3, 'z')],
+        #                       [(2, 'z'), (3, 'x')],
+        #                       [(2, 'z'), (3, 'y')],
+        #                       [(2, 'z'), (3, 'z')]]
+        Pauli_string_lists = [Pauli_string \
+                            for Pauli_string_list in Pauli_string_lists \
+                            for Pauli_string in Pauli_string_list]
+        
+        # Pauli_string_lists_indices contains only the index of the sites in Pauli_string_lists (auxiliary variable)
+        # E.g. in the example above, it is
+        # Pauli_string_lists = [[0], [0], [0], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3], [2, 3]]
+        Pauli_string_lists_indices = [[P[0] for P in Ps] for Ps in Pauli_string_lists]
+        
+        # P_mx is the indicator matrix of whether a particular site is in Pauli_string_lists
+        # Its size is num_input_qubits x len(Pauli_string_lists_indices)
+        # It is used in the linear programming condition needed to determine the earth mover distance
+        # E.g. in the example above,
+        # P_mx = np.array([[1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        #                  [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
+        #                  [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1],
+        #                  [0, 0, 0, 1, 1, 1, 1, 1, 1, 1, 1, 1]])
+        P_mx = numpy.array([[1. if i in PSI else 0 for PSI in Pauli_string_lists_indices] for i in range(system_params['num_input_qubits'])])
+
+        # Calculat the expectation value of each Pauli string in each
+        # input state or output density matrix
+        # Generates the following results:
+        # - expval_input_list_list: an array of size len(input_states) x len(Pauli_string_list)
+        # - expval_output_list_list: an array of size len(output_dms) x len(Pauli_string_list)
+        
+        
+        #FO this input state should be simply self.__sp(x,0)
         expval_input_list_list = expval_Pauli_strings(input_states,
                                                     Pauli_string_lists,
                                                     in_mid_out_Q='input')
