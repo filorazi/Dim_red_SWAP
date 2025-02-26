@@ -16,7 +16,7 @@ from utils import *
 import os
 from EMCost import *
 from pennylane.math import reduce_dm
-import optax 
+# import optax 
 
 #autoencoder senza  jax
 
