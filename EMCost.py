@@ -553,13 +553,23 @@ def cost__EM(input_states):
         # Note, however, that the corner of the simplex maximizing c.T @ w can change during the
         # gradient descent learning procedure. This can lead to wiggles in the cost function during
         # minimization.
+        np.random.seed(42)
         w = cvxpy.Variable(len(Pauli_string_lists_indices))
 
+        if jax:
+            import jax.random as jrandom
+
+            key = jrandom.PRNGKey(42)  # For JAX
+
         for i_state in range(n_states):
+
             # expval_output_list_list is of qml.ArrayBox type, hence it needs to be transformed to regular numpy arrays
             expval_diff = qml.math.toarray(expval_output_list_list[i_state]) - jnp.array(expval_input_list_list[i_state])
             lin_prog_problem = cvxpy.Problem(cvxpy.Maximize(expval_diff.T @ w), [P_mx @ cvxpy.abs(w) <= 1.])
-            lin_prog_problem.solve()
+            lin_prog_problem.solve(solver=cvxpy.SCS, verbose=False,    use_indirect=False,  # Use direct solver to avoid numerical instability
+    eps=1e-9,            # Set a very small tolerance for precision
+)
+
             
             # Note that we cannot use the numpy vector expval_diff in the cost function
             # Instead, we need to use the pennylane.numpy or jax.numpy vectors that allow us to differentiate
