@@ -5,7 +5,6 @@ from pennylane import numpy as np
 import pandas as pd
 import seaborn as sns
 import matplotlib.pyplot as plt
-import seaborn as sns
 import matplotlib.pyplot as plt
 from sklearn.metrics import mean_absolute_error as mse
 from scipy.optimize import minimize

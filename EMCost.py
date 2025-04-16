@@ -255,6 +255,7 @@ def get_site_combinations(n_system_sites:int, operator_support:int, support_prob
         # use these operators in the cost function
         arr = np.array(arr, dtype=np.int16)
         if random_shift_sites_Q:
+            random.seed(42)
             arr = (arr + random.randint(0, n_system_sites)) % n_system_sites
         arr = arr.reshape(-1, arr.shape[-1])
         arr = np.sort(arr, axis=-1)
@@ -566,9 +567,7 @@ def cost__EM(input_states):
             # expval_output_list_list is of qml.ArrayBox type, hence it needs to be transformed to regular numpy arrays
             expval_diff = qml.math.toarray(expval_output_list_list[i_state]) - jnp.array(expval_input_list_list[i_state])
             lin_prog_problem = cvxpy.Problem(cvxpy.Maximize(expval_diff.T @ w), [P_mx @ cvxpy.abs(w) <= 1.])
-            lin_prog_problem.solve(solver=cvxpy.SCS, verbose=False,    use_indirect=False,  # Use direct solver to avoid numerical instability
-    eps=1e-9,            # Set a very small tolerance for precision
-)
+            lin_prog_problem.solve()
 
             
             # Note that we cannot use the numpy vector expval_diff in the cost function
