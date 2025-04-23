@@ -49,7 +49,7 @@ def main():
     n_qubit=param.n_input_qubit
     dvc = qml.device('default.mixed', wires=n_qubit, shots=None)
  
-    set_global( param.n_trash_qubit,
+    set_global( [[-2.0206146e-02  0.0000000e+00  2.6169906e-03 -2.0206146e-02,
             param.n_trash_qubit,
             param.n_trash_qubit,
             param.list_op_support[:param.n_trash_qubit],

@@ -127,6 +127,10 @@ def compare_matrix_EM_ising(n_qubit_autoencoder,n_trash_qubit,ae,loc=9,interval 
     list_op_support=[1,2,3]
     list_op_support_probs=[1., 1., 1.]
     list_op_support_max_range=[1, 5, 3]
+    list_op_support=[1,2]
+    list_op_support_probs=[1., 1.]
+    list_op_support_max_range=[1, 2]
+
     i =1
     mq=n_qubit_autoencoder-n_trash_qubit
     set_global( mq,
@@ -138,16 +142,16 @@ def compare_matrix_EM_ising(n_qubit_autoencoder,n_trash_qubit,ae,loc=9,interval 
         list_op_support_max_range[:mq],
         use_jax=False)
 
-    data=get_data(n_qubit_autoencoder)
-    m1=[]
-    for b in range(1,100,interval):
-        c1=[]
-        for a in range(1,100,interval):
-            res1 = get_state_ae_ising(n_qubit_autoencoder,ae,list(range(n_trash_qubit-1, n_qubit_autoencoder-1,1)))([data.ground_states[a]])
+    # data=get_data(n_qubit_autoencoder)
+    # m1=[]
+    # for b in range(1,100,interval):
+    #     c1=[]
+    #     for a in range(1,100,interval):
+    #         res1 = get_state_ae_ising(n_qubit_autoencoder,ae,list(range(n_trash_qubit-1, n_qubit_autoencoder-1,1)))([data.ground_states[a]])
             
-            res2 = get_state_ae_ising(n_qubit_autoencoder,ae,list(range(n_trash_qubit-1, n_qubit_autoencoder-1,1)))([data.ground_states[b]])
-            c1.append(cost__EM([res1])([res2]))
-        m1.append(c1)
+    #         res2 = get_state_ae_ising(n_qubit_autoencoder,ae,list(range(n_trash_qubit-1, n_qubit_autoencoder-1,1)))([data.ground_states[b]])
+    #     #     c1.append(cost__EM([res1])([res2]))
+    #     # m1.append(c1)
 
     
     mq=n_qubit_autoencoder
@@ -160,6 +164,9 @@ def compare_matrix_EM_ising(n_qubit_autoencoder,n_trash_qubit,ae,loc=9,interval 
         list_op_support_max_range[:mq],
         use_jax=False)
     orig=[]
+    for i in range(40):
+        print(cost__EM([np.outer(data.ground_states[1], np.conjugate(data.ground_states[1]))])([np.outer(data.ground_states[23], np.conjugate(data.ground_states[23]))]))
+    exit()
     for b in range(1,100,interval):
         d1=[]
         for a in range(1,100,interval):

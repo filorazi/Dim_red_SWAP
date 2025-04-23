@@ -139,6 +139,7 @@ def expval_Pauli_strings(states_in_list,
     #         state_op_expval += [expval_operators_middle(state, ops)]
     elif in_mid_out_Q=='output':
         for state in states_in_list:
+            print(ops)
             state_op_expval += [expval_operators_output(state, ops)]
     state_op_expval = jnp.array(state_op_expval)
     return state_op_expval
@@ -246,8 +247,9 @@ def get_site_combinations(n_system_sites:int, operator_support:int, support_prob
         # is at the second site
         arr =  [[0] + list(c) for c in list(itertools.combinations(list(
                 range(1, min(max_rng, n_system_sites))), operator_support-1))]
-        arr += [[1] + list(c) for c in list(itertools.combinations([i%n_system_sites
-                for i in range(2, min(max_rng+1, n_system_sites+1))], operator_support-1))]
+        if n_system_sites>1:
+            arr += [[1] + list(c) for c in list(itertools.combinations([i%n_system_sites
+                    for i in range(2, min(max_rng+1, n_system_sites+1))], operator_support-1))]
 
         # however, we shift the generated array around by a random vector just
         # to make sure that we are not pushing some unforeseen bias in the network
@@ -255,7 +257,7 @@ def get_site_combinations(n_system_sites:int, operator_support:int, support_prob
         # use these operators in the cost function
         arr = np.array(arr, dtype=np.int16)
         if random_shift_sites_Q:
-            random.seed(42)
+            # random.seed(42)
             arr = (arr + random.randint(0, n_system_sites)) % n_system_sites
         arr = arr.reshape(-1, arr.shape[-1])
         arr = np.sort(arr, axis=-1)
@@ -390,7 +392,7 @@ def cost_fn_EM(X,trainer,input_states):
 
         expval_output_list_list = expval_Pauli_strings(output_dms,
                                                     Pauli_string_lists,
-                                                    in_mid_out_Q='output')
+                                                    in_mid_out_Q='input')
         
         # The earth mover distance part of the cost function for each pair of input and output states is
         # max_{w} sum_op w_op * c_op, where c_op = Tr(op @ (out_dm - in_dm))
@@ -532,7 +534,6 @@ def cost__EM(input_states):
         expval_input_list_list = expval_Pauli_strings(input_states,
                                                     Pauli_string_lists,
                                                     in_mid_out_Q='input')
-
         expval_output_list_list = expval_Pauli_strings(output_dms,
                                                     Pauli_string_lists,
                                                     in_mid_out_Q='output')
@@ -563,13 +564,11 @@ def cost__EM(input_states):
             key = jrandom.PRNGKey(42)  # For JAX
 
         for i_state in range(n_states):
-
             # expval_output_list_list is of qml.ArrayBox type, hence it needs to be transformed to regular numpy arrays
             expval_diff = qml.math.toarray(expval_output_list_list[i_state]) - jnp.array(expval_input_list_list[i_state])
             lin_prog_problem = cvxpy.Problem(cvxpy.Maximize(expval_diff.T @ w), [P_mx @ cvxpy.abs(w) <= 1.])
             lin_prog_problem.solve()
 
-            
             # Note that we cannot use the numpy vector expval_diff in the cost function
             # Instead, we need to use the pennylane.numpy or jax.numpy vectors that allow us to differentiate
             # the cost finction. The solution of the optimization, however, is a simple constant vector
